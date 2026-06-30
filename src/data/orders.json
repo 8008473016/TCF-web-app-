@@ -1,0 +1,80 @@
+[
+  {
+    "Order ID": "TCF-ORD-137723",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Unpaid",
+    "Payment Method": "UPI_QR",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:44.583Z"
+  },
+  {
+    "Order ID": "TCF-ORD-605375",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Unpaid",
+    "Payment Method": "UPI_QR",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:47.865Z"
+  },
+  {
+    "Order ID": "TCF-ORD-360437",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Unpaid",
+    "Payment Method": "Razorpay",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:50.462Z"
+  },
+  {
+    "Order ID": "TCF-ORD-229410",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Pending",
+    "Payment Method": "COD",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:52.914Z"
+  },
+  {
+    "Order ID": "TCF-ORD-477899",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Pending",
+    "Payment Method": "COD",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:53.628Z"
+  },
+  {
+    "Order ID": "TCF-ORD-779055",
+    "Customer Name": "Vennala",
+    "Email": "dvinni98@gmail.com",
+    "Phone": "Dandu",
+    "Shipping Address": "Vijayawada, PIN - 520015",
+    "Products": "[{\"productId\":\"PROD001\",\"name\":\"Royal Teak Wood 3-Seater Sofa\",\"sku\":\"TCF-SOF-TEK-01\",\"price\":72000,\"quantity\":1,\"finish\":\"Natural Polish\"}]",
+    "Amount": "72000",
+    "Payment Status": "Pending",
+    "Payment Method": "COD",
+    "Order Status": "Pending",
+    "Created At": "2026-06-19T09:47:54.065Z"
+  }
+]

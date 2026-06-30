@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-tcf-red: #DE2943;
+  --color-tcf-light: #F5F2EB;
+  --color-tcf-dark: #121110;
+  --color-tcf-wood: #2C1A14;
+  --color-tcf-gold: #DFBA73;
+  --color-tcf-sand: #E5E0DA;
+
+  --color-zinc-50: #FDFDFB;
+  --color-zinc-100: #F5F2EB;
+  --color-zinc-200: #EADFD5;
+  --color-zinc-300: #D5C4B4;
+  --color-zinc-400: #B09680;
+  --color-zinc-500: #8C705C;
+  --color-zinc-600: #6C5243;
+  --color-zinc-700: #383431;
+  --color-zinc-800: #262322;
+  --color-zinc-900: #1C1A19;
+  --color-zinc-950: #0B0A09;
+
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --shadow-premium: 0 10px 30px -15px rgba(222, 41, 67, 0.15);
+  --shadow-luxury: 0 20px 40px -20px rgba(31, 31, 31, 0.25);
+}
+
+:root {
+  --background: #F5F2EB;
+  --foreground: #121110;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Premium wood grid texture overlay */
+.wood-overlay {
+  background-image: url('/dark-wood.png');
+  background-repeat: repeat;
+}
+
+/* High-end glassmorphism styling */
+.glass {
+  background: rgba(245, 242, 235, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(229, 224, 218, 0.5);
+}

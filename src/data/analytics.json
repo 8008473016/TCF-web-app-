@@ -1,0 +1,230 @@
+{
+  "visits": [
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T06:13:30.908Z"
+    },
+    {
+      "path": "/blogs",
+      "timestamp": "2026-06-28T06:13:35.291Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T06:13:42.035Z"
+    },
+    {
+      "path": "/products",
+      "timestamp": "2026-06-28T06:14:55.253Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T06:15:41.173Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:46:49.127Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:54:16.991Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:54:36.274Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:55:06.139Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:55:26.873Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:55:39.253Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T09:57:06.429Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T10:39:05.506Z"
+    },
+    {
+      "path": "/products/royal-teak-wood-3-seater-sofa",
+      "timestamp": "2026-06-28T10:39:29.835Z"
+    },
+    {
+      "path": "/products/royal-teak-wood-3-seater-sofa",
+      "timestamp": "2026-06-28T10:39:36.586Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T10:39:50.286Z"
+    },
+    {
+      "path": "/products/royal-teak-wood-3-seater-sofa",
+      "timestamp": "2026-06-28T10:39:51.529Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T10:39:54.964Z"
+    },
+    {
+      "path": "/products/royal-teak-wood-3-seater-sofa",
+      "timestamp": "2026-06-28T10:40:54.615Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T12:22:01.771Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:22:04.557Z"
+    },
+    {
+      "path": "/products/sofas-design-4-2739",
+      "timestamp": "2026-06-28T12:22:17.026Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:22:21.356Z"
+    },
+    {
+      "path": "/products?category=beds",
+      "timestamp": "2026-06-28T12:22:26.149Z"
+    },
+    {
+      "path": "/products?category=dining-tables",
+      "timestamp": "2026-06-28T12:22:31.076Z"
+    },
+    {
+      "path": "/products?category=dining-chairs",
+      "timestamp": "2026-06-28T12:22:34.442Z"
+    },
+    {
+      "path": "/products?category=coffee-tables",
+      "timestamp": "2026-06-28T12:22:39.181Z"
+    },
+    {
+      "path": "/products?category=tv-units",
+      "timestamp": "2026-06-28T12:22:40.170Z"
+    },
+    {
+      "path": "/products?category=wardrobes",
+      "timestamp": "2026-06-28T12:22:41.284Z"
+    },
+    {
+      "path": "/products?category=bookshelves",
+      "timestamp": "2026-06-28T12:22:41.850Z"
+    },
+    {
+      "path": "/products?category=study-tables",
+      "timestamp": "2026-06-28T12:22:42.291Z"
+    },
+    {
+      "path": "/products?category=storage-furniture",
+      "timestamp": "2026-06-28T12:22:43.015Z"
+    },
+    {
+      "path": "/products?category=pooja-units",
+      "timestamp": "2026-06-28T12:22:44.727Z"
+    },
+    {
+      "path": "/products?category=storage-furniture",
+      "timestamp": "2026-06-28T12:22:57.669Z"
+    },
+    {
+      "path": "/products?category=pooja-units",
+      "timestamp": "2026-06-28T12:22:59.199Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:24:00.683Z"
+    },
+    {
+      "path": "/products?category=beds",
+      "timestamp": "2026-06-28T12:24:04.696Z"
+    },
+    {
+      "path": "/products?category=dining-tables",
+      "timestamp": "2026-06-28T12:24:19.155Z"
+    },
+    {
+      "path": "/gallery",
+      "timestamp": "2026-06-28T12:24:20.917Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:24:41.562Z"
+    },
+    {
+      "path": "/products?category=beds",
+      "timestamp": "2026-06-28T12:24:52.797Z"
+    },
+    {
+      "path": "/products?category=dining-tables",
+      "timestamp": "2026-06-28T12:24:54.103Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T12:46:26.343Z"
+    },
+    {
+      "path": "/gallery",
+      "timestamp": "2026-06-28T12:47:10.228Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:47:15.769Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:47:25.861Z"
+    },
+    {
+      "path": "/products/sofas-design-16-2787",
+      "timestamp": "2026-06-28T12:48:17.394Z"
+    },
+    {
+      "path": "/products?category=sofas",
+      "timestamp": "2026-06-28T12:48:20.873Z"
+    },
+    {
+      "path": "/products?category=dining-tables",
+      "timestamp": "2026-06-28T12:49:25.254Z"
+    },
+    {
+      "path": "/products?category=dining-chairs",
+      "timestamp": "2026-06-28T12:49:35.920Z"
+    },
+    {
+      "path": "/products?category=pooja-units",
+      "timestamp": "2026-06-28T12:49:38.858Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T12:49:48.954Z"
+    },
+    {
+      "path": "/products",
+      "timestamp": "2026-06-28T12:49:52.505Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T12:49:57.632Z"
+    },
+    {
+      "path": "/",
+      "timestamp": "2026-06-28T13:32:39.685Z"
+    }
+  ],
+  "productViews": {},
+  "ctaClicks": {
+    "call": 0,
+    "whatsapp": 0,
+    "quote": 0
+  }
+}
