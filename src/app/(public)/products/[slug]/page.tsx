@@ -52,7 +52,10 @@ const parseImages = (images: any): string[] => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const products = await db.read('products');
-  const product = products.find((p: any) => p.slug === slug || p.slug === decodeURIComponent(slug));
+  const product = products.find((p: any) => {
+    const s = p.slug || p['Slug'];
+    return s === slug || s === decodeURIComponent(slug);
+  });
   
   if (!product) {
     return {
@@ -77,7 +80,10 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const products = await db.read('products');
   
-  const productData = products.find((p: any) => p.slug === slug || p.slug === decodeURIComponent(slug));
+  const productData = products.find((p: any) => {
+    const s = p.slug || p['Slug'];
+    return s === slug || s === decodeURIComponent(slug);
+  });
   
   if (!productData) {
     notFound();

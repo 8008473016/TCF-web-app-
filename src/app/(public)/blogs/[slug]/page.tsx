@@ -90,16 +90,22 @@ export default async function BlogDetailPage({ params }: Props) {
   // Get recommended products for the sidebar
   const rawProducts = await db.read('products');
   const recommendedProducts = rawProducts
-    .filter((p: any) => p.featured)
+    .filter((p: any) => p.featured === true || p['Featured'] === true || p['Featured'] === 'TRUE')
     .slice(0, 3)
     .map((p: any) => ({
-      id: String(p.id),
-      name: String(p.name || ''),
-      slug: String(p.slug || ''),
-      price: Number(p.price || 0),
-      salePrice: p.salePrice ? Number(p.salePrice) : null,
-      images: Array.isArray(p.images) ? p.images : typeof p.images === 'string' ? JSON.parse(p.images) : [],
-      material: String(p.material || '')
+      id: String(p.id || p['Product ID'] || ''),
+      name: String(p.name || p['Product Name'] || ''),
+      slug: String(p.slug || p['Slug'] || ''),
+      price: Number(p.price || p['Price'] || 0),
+      salePrice: p.salePrice || p['Sale Price'] ? Number(p.salePrice || p['Sale Price']) : null,
+      images: Array.isArray(p.images) 
+        ? p.images 
+        : typeof p.images === 'string' 
+          ? JSON.parse(p.images) 
+          : typeof p['Images'] === 'string' 
+            ? p['Images'].split(',').map((img: string) => img.trim()).filter(Boolean)
+            : [],
+      material: String(p.material || p['Material'] || '')
     }));
 
   const settings = await getSettings();

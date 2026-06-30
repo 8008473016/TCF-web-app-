@@ -68,8 +68,30 @@ export default async function HomePage() {
   ];
   const banners = settings?.banners || defaultBanners;
 
-  // Filter out featured products
-  const featuredProducts = products.filter((p: any) => p.featured && !p.archived).slice(0, 4);
+  // Filter out featured products and format them for ProductCard
+  const featuredProducts = products
+    .filter((p: any) => (p.featured === true || p['Featured'] === true || p['Featured'] === 'TRUE') && !(p.archived === true || p['Archived'] === true || p['Archived'] === 'TRUE'))
+    .slice(0, 4)
+    .map((p: any) => ({
+      id: String(p.id || p['Product ID'] || ''),
+      sku: String(p.sku || p['SKU'] || ''),
+      name: String(p.name || p['Product Name'] || ''),
+      slug: String(p.slug || p['Slug'] || ''),
+      category: String(p.category || p['Category'] || ''),
+      description: String(p.description || p['Description'] || ''),
+      price: Number(p.price || p['Price'] || 0),
+      salePrice: p.salePrice || p['Sale Price'] ? Number(p.salePrice || p['Sale Price']) : null,
+      images: Array.isArray(p.images) 
+        ? p.images 
+        : typeof p.images === 'string' 
+          ? JSON.parse(p.images) 
+          : typeof p['Images'] === 'string' 
+            ? p['Images'].split(',').map((img: string) => img.trim()).filter(Boolean)
+            : [],
+      material: String(p.material || p['Material'] || ''),
+      dimensions: String(p.dimensions || p['Dimensions'] || ''),
+      stock: Number(p.stock !== undefined ? p.stock : p['Stock'] !== undefined ? p['Stock'] : 1)
+    }));
 
   // Trust Badges
   const trustSignals = [
