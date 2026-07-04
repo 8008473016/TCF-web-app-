@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 import { JWT } from 'google-auth-library';
 import { sheets as googleSheets } from '@googleapis/sheets';
 import { config as appConfig, isGoogleConfigured } from './config';
@@ -45,21 +46,25 @@ const mapSheetName = (tableName: string): string => {
   }
 };
 
-async function readLocalFile(path: string): Promise<any[]> {
+async function readLocalFile(filePath: string): Promise<any[]> {
   try {
-    const data = await fs.readFile(path, 'utf-8');
+    const data = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(data);
   } catch (err: any) {
     if (err.code === 'ENOENT') {
-      await fs.writeFile(path, JSON.stringify([]));
+      const dir = path.dirname(filePath);
+      await fs.mkdir(dir, { recursive: true });
+      await fs.writeFile(filePath, JSON.stringify([]));
       return [];
     }
     throw err;
   }
 }
 
-async function writeLocalFile(path: string, data: any[]): Promise<void> {
-  await fs.writeFile(path, JSON.stringify(data, null, 2));
+async function writeLocalFile(filePath: string, data: any[]): Promise<void> {
+  const dir = path.dirname(filePath);
+  await fs.mkdir(dir, { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
 }
 
 async function getSheetId(sheetName: string): Promise<number> {
