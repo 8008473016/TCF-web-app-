@@ -102,13 +102,20 @@ export async function PUT(
       'createdAt': body.createdAt || new Date().toISOString(),
       'updatedAt': new Date().toISOString()
     };
-    const success = await db.update('categories', 'Category ID', categoryId, updatedCategory);
-    if (success) {
-      return NextResponse.json({ message: 'Category updated successfully' });
+
+    // Check if category exists in JSON to decide update or insert (upsert)
+    const categories = await db.read('categories');
+    const exists = categories.some((item: any) => String(item.id || item['Category ID']) === String(categoryId));
+
+    if (exists) {
+      await db.update('categories', 'Category ID', categoryId, updatedCategory);
+      return NextResponse.json({ success: true, message: 'Category updated successfully' });
     } else {
-      return NextResponse.json({ message: 'Category not found' }, { status: 404 });
+      await db.insert('categories', updatedCategory);
+      return NextResponse.json({ success: true, message: 'Category created and registered successfully' });
     }
   } catch (error: any) {
-    return NextResponse.json({ message: 'Error updating category', error: error.message }, { status: 500 });
+    console.error(`[API ERROR] Category update failed for category ${params}:`, error);
+    return NextResponse.json({ success: false, message: 'Error updating/creating category', error: error.message }, { status: 500 });
   }
 }

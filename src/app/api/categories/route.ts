@@ -121,8 +121,9 @@ export async function POST(req: NextRequest) {
       'updatedAt': now
     };
     const result = await db.insert('categories', newCategory);
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json({ success: true, ...result }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ message: 'Error creating category', error: error.message }, { status: 500 });
+    console.error('[API ERROR] Category creation failed:', error);
+    return NextResponse.json({ success: false, message: 'Error creating category', error: error.message }, { status: 500 });
   }
 }

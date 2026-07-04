@@ -49,6 +49,10 @@ const mapSheetName = (tableName: string): string => {
 async function readLocalFile(filePath: string): Promise<any[]> {
   try {
     const data = await fs.readFile(filePath, 'utf-8');
+    if (!data.trim()) {
+      await fs.writeFile(filePath, JSON.stringify([]));
+      return [];
+    }
     return JSON.parse(data);
   } catch (err: any) {
     if (err.code === 'ENOENT') {
