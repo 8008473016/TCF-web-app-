@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { path: pathSegments } = await params;
-    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const uploadsDir = path.resolve(process.cwd(), 'public/uploads');
 
     const filePath = path.join(uploadsDir, ...pathSegments);
 
