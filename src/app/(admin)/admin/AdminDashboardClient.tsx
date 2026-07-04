@@ -245,8 +245,9 @@ export const AdminDashboardClient: React.FC = () => {
       }
       setIsCategoryModalOpen(false);
       fetchCategories();
-    } catch {
-      alert(editingCategory ? 'Failed to update category.' : 'Failed to add category.');
+    } catch (error: any) {
+      console.error(error);
+      alert(`Failed to save category: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
     }
   };
 
