@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     const categories = await db.read('categories');
     
     // Scan uploads directory for products folders
-    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const uploadsDir = path.resolve(process.cwd(), 'public/uploads');
     const productsDir = path.resolve(uploadsDir, 'products');
     let physicalFolders: string[] = [];
     
@@ -48,8 +48,8 @@ export async function GET(req: NextRequest) {
         slug: slug,
         description: c['Description'] || c.description,
         banner: c['Banner'] || c.banner,
-        folderPath: c.folderPath || `${uploadsDir.replace(/\/$/, '')}/products/${slug}`,
-        publicUrl: c.publicUrl || `${(process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads').replace(/\/$/, '')}/products/${slug}`,
+        folderPath: c.folderPath || `public/uploads/products/${slug}`,
+        publicUrl: c.publicUrl || `/uploads/products/${slug}`,
         createdAt: c.createdAt || new Date().toISOString(),
         updatedAt: c.updatedAt || new Date().toISOString(),
         folderExists: folderExists,
@@ -67,8 +67,8 @@ export async function GET(req: NextRequest) {
           slug: folderName,
           description: 'Physical folder with no category definition in JSON.',
           banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
-          folderPath: `${uploadsDir.replace(/\/$/, '')}/products/${folderName}`,
-          publicUrl: `${(process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads').replace(/\/$/, '')}/products/${folderName}`,
+          folderPath: `public/uploads/products/${folderName}`,
+          publicUrl: `/uploads/products/${folderName}`,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           folderExists: true,
@@ -94,17 +94,14 @@ export async function POST(req: NextRequest) {
     const slug = makeSafeSlug(c.slug || c.name);
     const now = new Date().toISOString();
     
-    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
-    const publicUploadsUrl = process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads';
-    
-    // Automatically create category folder
-    const targetDir = path.resolve(uploadsDir, 'products', slug);
+    // Automatically create category folder inside public/uploads
+    const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
 
-    const folderPath = `${uploadsDir.replace(/\/$/, '')}/products/${slug}`;
-    const publicUrl = `${publicUploadsUrl.replace(/\/$/, '')}/products/${slug}`;
+    const folderPath = `public/uploads/products/${slug}`;
+    const publicUrl = `/uploads/products/${slug}`;
 
     const newCategory = {
       'Category ID': c.id || slug,

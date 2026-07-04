@@ -41,7 +41,16 @@ yarn-error.log*
 next-env.d.ts
 
 # uploads
-public/uploads/
+public/uploads/*
+!public/uploads/.gitkeep
+!public/uploads/products/
+!public/uploads/products/.gitkeep
+
+# data JSON files
+src/data/*.json
+!src/data/.gitkeep
+
 server_backup/
 product images/
+
 

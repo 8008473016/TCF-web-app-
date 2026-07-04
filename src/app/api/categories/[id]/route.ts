@@ -40,8 +40,7 @@ export async function DELETE(
     if (success) {
       if (deleteFolder && category) {
         const slug = category.slug || category['Slug'];
-        const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
-        const targetDir = path.resolve(uploadsDir, 'products', slug);
+        const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
         if (fs.existsSync(targetDir)) {
           fs.rmSync(targetDir, { recursive: true, force: true });
         }
@@ -72,11 +71,9 @@ export async function PUT(
     const ensureFolderOnly = body.action === 'create-folder';
 
     const slug = makeSafeSlug(body.slug || body.name || categoryId);
-    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
-    const publicUploadsUrl = process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads';
-
-    // Automatically create category folder
-    const targetDir = path.resolve(uploadsDir, 'products', slug);
+    
+    // Automatically create category folder inside public/uploads
+    const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
@@ -85,8 +82,8 @@ export async function PUT(
       return NextResponse.json({ message: 'Folder created successfully' });
     }
 
-    const folderPath = `${uploadsDir.replace(/\/$/, '')}/products/${slug}`;
-    const publicUrl = `${publicUploadsUrl.replace(/\/$/, '')}/products/${slug}`;
+    const folderPath = `public/uploads/products/${slug}`;
+    const publicUrl = `/uploads/products/${slug}`;
 
     const updatedCategory = {
       'Category ID': categoryId,

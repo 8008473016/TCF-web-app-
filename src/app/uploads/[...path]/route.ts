@@ -8,11 +8,7 @@ export async function GET(
 ) {
   try {
     const { path: pathSegments } = await params;
-    const uploadsDir = process.env.UPLOADS_DIR;
-
-    if (!uploadsDir) {
-      return new NextResponse('UPLOADS_DIR environment variable is not set.', { status: 500 });
-    }
+    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
 
     const filePath = path.join(uploadsDir, ...pathSegments);
 

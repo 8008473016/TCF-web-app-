@@ -49,11 +49,7 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
-    const publicUploadsUrl = process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads';
-
-    // Create target subdirectory
-    const targetDir = path.resolve(uploadsDir, 'products', catSub);
+    const targetDir = path.resolve(process.cwd(), 'public/uploads/products', catSub);
     if (!fs.existsSync(targetDir)) {
       fs.mkdirSync(targetDir, { recursive: true });
     }
@@ -62,7 +58,7 @@ export async function POST(req: NextRequest) {
     const targetFilePath = path.join(targetDir, fileName);
     await fs.promises.writeFile(targetFilePath, buffer);
 
-    const fileUrl = `${publicUploadsUrl.replace(/\/$/, '')}/products/${catSub ? catSub + '/' : ''}${fileName}`;
+    const fileUrl = `/uploads/products/${catSub ? catSub + '/' : ''}${fileName}`;
 
     const sizeStr = `${Math.round(file.size / 1024)} KB`;
     const newMedia = {
