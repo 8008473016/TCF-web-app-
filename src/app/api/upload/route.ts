@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
+import { existsSync, mkdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
 import path from 'path';
 
 export async function POST(req: NextRequest) {
@@ -20,16 +21,16 @@ export async function POST(req: NextRequest) {
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
     
     const targetDir = path.resolve(process.cwd(), 'public/uploads/products', catSub);
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
+    if (!existsSync(targetDir)) {
+      mkdirSync(targetDir, { recursive: true });
     }
     const targetFilePath = path.join(targetDir, fileName);
-    await fs.promises.writeFile(targetFilePath, buffer);
+    await writeFile(targetFilePath, buffer);
     
     const fileUrl = `/uploads/products/${catSub ? catSub + '/' : ''}${fileName}`;
     return NextResponse.json({ success: true, url: fileUrl });
   } catch (error: any) {
-    console.error('API Upload error:', error);
-    return NextResponse.json({ success: false, message: error.message || 'File upload failed' }, { status: 500 });
+    console.error('[UPLOAD ERROR]:', error);
+    return NextResponse.json({ success: false, message: error.message || 'File upload failed', error: error.stack }, { status: 500 });
   }
 }
