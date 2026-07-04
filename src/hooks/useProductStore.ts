@@ -26,6 +26,8 @@ export interface Category {
   slug: string;
   description: string;
   banner: string;
+  folderExists?: boolean;
+  isUnregistered?: boolean;
 }
 
 export interface Blog {

@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { config } from '@/lib/config';
+import fs from 'fs';
+import path from 'path';
 
 const isAdmin = (req: NextRequest): boolean => {
   const token = req.headers.get('authorization') || req.headers.get('x-admin-token');
   return token === config.adminSecret;
+};
+
+const makeSafeSlug = (name: string): string => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // remove special characters
+    .replace(/\s+/g, '-')        // spaces to hyphens
+    .replace(/-+/g, '-')         // remove duplicate hyphens
+    .trim();
 };
 
 // DELETE /api/categories/[id]
@@ -18,8 +29,23 @@ export async function DELETE(
 
   try {
     const { id: categoryId } = await params;
+    const url = new URL(req.url);
+    const deleteFolder = url.searchParams.get('deleteFolder') === 'true';
+
+    // Get the category details to know the slug before deleting
+    const categories = await db.read('categories');
+    const category = categories.find(c => (c.id || c['Category ID']) === categoryId);
+
     const success = await db.delete('categories', 'Category ID', categoryId);
     if (success) {
+      if (deleteFolder && category) {
+        const slug = category.slug || category['Slug'];
+        const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
+        const targetDir = path.resolve(uploadsDir, 'products', slug);
+        if (fs.existsSync(targetDir)) {
+          fs.rmSync(targetDir, { recursive: true, force: true });
+        }
+      }
       return NextResponse.json({ message: 'Category deleted successfully' });
     } else {
       return NextResponse.json({ message: 'Category not found' }, { status: 404 });
@@ -41,12 +67,40 @@ export async function PUT(
   try {
     const { id: categoryId } = await params;
     const body = await req.json();
+    
+    // Check if the PUT is specifically a request to just create/ensure the directory exists
+    const ensureFolderOnly = body.action === 'create-folder';
+
+    const slug = makeSafeSlug(body.slug || body.name || categoryId);
+    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const publicUploadsUrl = process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads';
+
+    // Automatically create category folder
+    const targetDir = path.resolve(uploadsDir, 'products', slug);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
+    }
+
+    if (ensureFolderOnly) {
+      return NextResponse.json({ message: 'Folder created successfully' });
+    }
+
+    const folderPath = `${uploadsDir.replace(/\/$/, '')}/products/${slug}`;
+    const publicUrl = `${publicUploadsUrl.replace(/\/$/, '')}/products/${slug}`;
+
     const updatedCategory = {
       'Category ID': categoryId,
       'Category Name': body.name,
-      'Slug': body.slug,
-      'Description': body.description,
-      'Banner': body.banner,
+      'Slug': slug,
+      'Description': body.description || '',
+      'Banner': body.banner || '',
+      'id': categoryId,
+      'name': body.name,
+      'slug': slug,
+      'folderPath': folderPath,
+      'publicUrl': publicUrl,
+      'createdAt': body.createdAt || new Date().toISOString(),
+      'updatedAt': new Date().toISOString()
     };
     const success = await db.update('categories', 'Category ID', categoryId, updatedCategory);
     if (success) {

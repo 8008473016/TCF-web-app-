@@ -252,12 +252,23 @@ export const AdminDashboardClient: React.FC = () => {
 
   const handleDeleteCategory = async (id: string) => {
     if (!window.confirm('Delete this category? This might affect existing products.')) return;
+    const deleteFolder = window.confirm('Do you also want to delete the physical folder and all of its images on the server? (Warning: This action is irreversible)');
     try {
-      await api.delete(`/categories/${id}`);
+      await api.delete(`/categories/${id}?deleteFolder=${deleteFolder}`);
       fetchCategories();
       alert('Category deleted successfully.');
     } catch {
       alert('Failed to delete category.');
+    }
+  };
+
+  const handleCreateCategoryFolder = async (c: any) => {
+    try {
+      await api.put(`/categories/${c.id}`, { ...c, action: 'create-folder' });
+      fetchCategories();
+      alert('Physical folder created successfully!');
+    } catch {
+      alert('Failed to create category folder.');
     }
   };
 
@@ -1828,28 +1839,64 @@ export const AdminDashboardClient: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {categories.map((c) => (
-                      <div key={c.id} className="border border-gray-200 p-4 bg-gray-50 rounded-xl space-y-2 relative group">
-                        <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenCategoryModal(c)}
-                            className="text-blue-500 hover:text-blue-700 bg-white p-1 rounded border border-gray-200"
-                            title="Edit Category"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteCategory(c.id)}
-                            className="text-red-500 hover:text-red-700 bg-white p-1 rounded border border-gray-200"
-                            title="Delete Category"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                      <div key={c.id} className={`border p-4 rounded-xl space-y-2 relative group ${
+                        c.isUnregistered 
+                          ? 'border-amber-300 bg-amber-50/30' 
+                          : !c.folderExists 
+                            ? 'border-red-200 bg-red-50/10' 
+                            : 'border-gray-200 bg-gray-50'
+                      }`}>
+                        {!c.isUnregistered && (
+                          <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              type="button"
+                              onClick={() => handleOpenCategoryModal(c)}
+                              className="text-blue-500 hover:text-blue-700 bg-white p-1 rounded border border-gray-200 cursor-pointer"
+                              title="Edit Category"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteCategory(c.id)}
+                              className="text-red-500 hover:text-red-700 bg-white p-1 rounded border border-gray-200 cursor-pointer"
+                              title="Delete Category"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                        <div className="flex justify-between items-start">
+                          <span className="text-[10px] font-bold text-gray-500 uppercase">Slug: {c.slug}</span>
+                          {c.isUnregistered ? (
+                            <span className="bg-amber-100 text-amber-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Unregistered Folder</span>
+                          ) : !c.folderExists ? (
+                            <span className="bg-red-100 text-red-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Folder Missing</span>
+                          ) : (
+                            <span className="bg-green-100 text-green-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Folder OK</span>
+                          )}
                         </div>
-                        <span className="text-[10px] font-bold text-gray-500 uppercase">Slug: {c.slug}</span>
                         <h4 className="font-serif font-bold text-sm text-[#121110]">{c.name}</h4>
                         <p className="text-[11px] text-gray-500 leading-relaxed truncate">{c.description}</p>
+                        
+                        {/* Folder Status Actions */}
+                        {c.isUnregistered ? (
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCategoryModal({ name: c.name, slug: c.slug, description: 'Added from unregistered folder.' })}
+                            className="mt-2 w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
+                          >
+                            Register as Category
+                          </button>
+                        ) : !c.folderExists ? (
+                          <button
+                            type="button"
+                            onClick={() => handleCreateCategoryFolder(c)}
+                            className="mt-2 w-full py-1.5 bg-[#DE2943] hover:bg-red-750 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
+                          >
+                            Create Folder
+                          </button>
+                        ) : null}
                       </div>
                     ))}
                   </div>

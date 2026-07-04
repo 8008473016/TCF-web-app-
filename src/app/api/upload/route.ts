@@ -14,6 +14,9 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
+    const category = formData.get('category') as string | null;
+    const catSub = category ? category.toLowerCase().replace(/[^a-z0-9-]/g, '') : '';
+
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
     
     const uploadsDirEnv = process.env.UPLOADS_DIR;
@@ -21,26 +24,26 @@ export async function POST(req: NextRequest) {
 
     if (uploadsDirEnv) {
       // Hostinger external path
-      const targetDir = path.resolve(uploadsDirEnv, 'products');
+      const targetDir = path.resolve(uploadsDirEnv, 'products', catSub);
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
       }
       const targetFilePath = path.join(targetDir, fileName);
       await fs.promises.writeFile(targetFilePath, buffer);
       
-      const baseUrl = publicUrlEnv || 'https://yourdomain.com/uploads';
-      const fileUrl = `${baseUrl.replace(/\/$/, '')}/products/${fileName}`;
+      const baseUrl = publicUrlEnv || 'https://tenalicentralfurnitures.com/uploads';
+      const fileUrl = `${baseUrl.replace(/\/$/, '')}/products/${catSub ? catSub + '/' : ''}${fileName}`;
       return NextResponse.json({ success: true, url: fileUrl });
     } else {
       // Local fallback
-      const targetDir = path.resolve(process.cwd(), 'public/uploads/products');
+      const targetDir = path.resolve(process.cwd(), 'public/uploads/products', catSub);
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
       }
       const targetFilePath = path.join(targetDir, fileName);
       await fs.promises.writeFile(targetFilePath, buffer);
       
-      const fileUrl = `/uploads/products/${fileName}`;
+      const fileUrl = `/uploads/products/${catSub ? catSub + '/' : ''}${fileName}`;
       return NextResponse.json({ success: true, url: fileUrl });
     }
   } catch (error: any) {

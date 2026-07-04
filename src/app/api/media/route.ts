@@ -39,6 +39,8 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get('file') as File | null;
     const alt = formData.get('alt') as string || '';
+    const folder = (formData.get('folder') as string || '').replace(/^\//, '').trim();
+    const catSub = folder ? folder.toLowerCase().replace(/[^a-z0-9-]/g, '') : '';
     
     if (!file) {
       return NextResponse.json({ message: 'No file provided' }, { status: 400 });
@@ -47,19 +49,20 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const tempDir = path.resolve(process.cwd(), 'public/uploads/temp');
-    if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir, { recursive: true });
+    const uploadsDir = process.env.UPLOADS_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const publicUploadsUrl = process.env.PUBLIC_UPLOADS_URL || 'https://tenalicentralfurnitures.com/uploads';
+
+    // Create target subdirectory
+    const targetDir = path.resolve(uploadsDir, 'products', catSub);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
     }
 
-    const tempFilePath = path.join(tempDir, `${Date.now()}-${file.name}`);
-    await fs.promises.writeFile(tempFilePath, buffer);
+    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+    const targetFilePath = path.join(targetDir, fileName);
+    await fs.promises.writeFile(targetFilePath, buffer);
 
-    const fileUrl = await driveService.uploadFile(
-      tempFilePath,
-      `${Date.now()}-${file.name}`,
-      file.type
-    );
+    const fileUrl = `${publicUploadsUrl.replace(/\/$/, '')}/products/${catSub ? catSub + '/' : ''}${fileName}`;
 
     const sizeStr = `${Math.round(file.size / 1024)} KB`;
     const newMedia = {
