@@ -36,7 +36,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     openQuoteModal({ name: product.name, sku: product.sku });
   };
 
-  const mainImage = product.images?.[0] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80';
+  const [imgSrc, setImgSrc] = React.useState(product.images?.[0] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80');
+
+  React.useEffect(() => {
+    setImgSrc(product.images?.[0] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80');
+  }, [product.images]);
 
   return (
     <div className="group bg-white border border-tcf-sand hover:shadow-luxury rounded-xl overflow-hidden flex flex-col h-full relative transition-all duration-300">
@@ -57,12 +61,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       {/* Product Image Link */}
       <Link href={`/products/${product.slug}`} className="block overflow-hidden relative pt-[100%] bg-tcf-light">
         <Image 
-          src={mainImage} 
+          src={imgSrc} 
           alt={product.name} 
           fill
           sizes="(max-w-7xl) 25vw, (max-w-md) 50vw, 100vw"
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out"
           priority={false}
+          onError={() => setImgSrc('/logo.jpg')}
         />
         
         {/* Hover quick action overlay */}

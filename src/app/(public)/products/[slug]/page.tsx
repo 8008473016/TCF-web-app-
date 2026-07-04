@@ -103,7 +103,12 @@ export default async function ProductPage({ params }: Props) {
     dimensions: String(productData.dimensions || productData['Dimensions'] || ''),
     weight: Number(productData.weight || productData['Weight'] || 0),
     description: String(productData.description || productData['Description'] || ''),
-    stock: Number(productData.stock !== undefined ? productData.stock : productData['Stock'] !== undefined ? productData['Stock'] : 1)
+    stock: Number(productData.stock !== undefined ? productData.stock : productData['Stock'] !== undefined ? productData['Stock'] : 1),
+    customSizeAvailable: productData.customSizeAvailable !== undefined 
+      ? (productData.customSizeAvailable === true || productData.customSizeAvailable === 'true' || productData.customSizeAvailable === 'TRUE')
+      : productData['Custom Size Available'] !== undefined
+        ? (productData['Custom Size Available'] === true || productData['Custom Size Available'] === 'true' || productData['Custom Size Available'] === 'TRUE')
+        : true
   };
 
   // Get related products

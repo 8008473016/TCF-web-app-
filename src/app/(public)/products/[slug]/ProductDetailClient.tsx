@@ -22,6 +22,7 @@ interface Product {
   weight: number;
   description: string;
   stock: number;
+  customSizeAvailable?: boolean;
 }
 
 interface Review {
@@ -116,7 +117,13 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
     }
   };
 
-  const mainImage = product.images?.[activeImageIndex] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80';
+  const [currentImage, setCurrentImage] = useState(
+    product.images?.[activeImageIndex] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80'
+  );
+
+  React.useEffect(() => {
+    setCurrentImage(product.images?.[activeImageIndex] || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=800&q=80');
+  }, [activeImageIndex, product.images]);
 
   return (
     <div className="bg-tcf-light min-h-screen py-12 font-sans space-y-12">
@@ -139,11 +146,12 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
           <div className="space-y-4">
             <div className="relative border border-tcf-sand bg-tcf-light aspect-square overflow-hidden rounded-xl">
               <Image 
-                src={mainImage} 
+                src={currentImage} 
                 alt={product.name} 
                 fill
                 priority={true}
                 className="object-cover"
+                onError={() => setCurrentImage('/logo.jpg')}
               />
               {hasDiscount && (
                 <span className="absolute top-4 left-4 bg-tcf-red text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded shadow-premium z-10">
@@ -206,12 +214,14 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
             </p>
 
             {/* Custom Size Notice */}
-            <div className="bg-[#F5F2EB] border border-tcf-sand p-4 rounded-xl space-y-1">
-              <span className="text-xs font-bold text-tcf-red uppercase tracking-wider block">Custom Sizes Available</span>
-              <p className="text-[11px] text-tcf-dark/80 leading-relaxed font-light">
-                We manufacture furniture according to your requirements. This product can be customized in size, dimensions, color, finish, fabric, and material. Contact us for a personalized quotation.
-              </p>
-            </div>
+            {product.customSizeAvailable !== false && (
+              <div className="bg-[#F5F2EB] border border-tcf-sand p-4 rounded-xl space-y-1">
+                <span className="text-xs font-bold text-tcf-red uppercase tracking-wider block">Custom Sizes Available</span>
+                <p className="text-[11px] text-tcf-dark/80 leading-relaxed font-light">
+                  We manufacture furniture according to your requirements. This product can be customized in size, dimensions, color, finish, fabric, and material. Contact us for a personalized quotation.
+                </p>
+              </div>
+            )}
 
             {/* Finish selection mock details */}
             <div className="space-y-2">

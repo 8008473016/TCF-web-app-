@@ -90,6 +90,7 @@ export const AdminDashboardClient: React.FC = () => {
     id: '', sku: '', name: '', slug: '', category: '', description: '',
     price: 0, salePrice: '', stock: 1, material: 'Teak Wood', dimensions: '', weight: 0,
     images: [] as string[], featured: false, archived: false,
+    customSizeAvailable: true,
     seoTitle: '', seoDescription: '', seoKeywords: '', canonicalUrl: '',
     specifications: [] as { label: string; value: string }[],
     relatedProducts: [] as string[]
@@ -98,6 +99,7 @@ export const AdminDashboardClient: React.FC = () => {
   // Dynamic spec state
   const [newSpecLabel, setNewSpecLabel] = useState('');
   const [newSpecValue, setNewSpecValue] = useState('');
+  const [newGalleryImageUrl, setNewGalleryImageUrl] = useState('');
 
   // Media Library Dialog Selector (Wordpress-style picker)
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
@@ -280,6 +282,7 @@ export const AdminDashboardClient: React.FC = () => {
         images: Array.isArray(product.images) ? [...product.images] : [],
         featured: !!product.featured,
         archived: !!product.archived,
+        customSizeAvailable: product.customSizeAvailable !== undefined ? !!product.customSizeAvailable : true,
         seoTitle: product.seoTitle || '',
         seoDescription: product.seoDescription || '',
         seoKeywords: product.seoKeywords || '',
@@ -305,6 +308,7 @@ export const AdminDashboardClient: React.FC = () => {
         images: [],
         featured: false,
         archived: false,
+        customSizeAvailable: true,
         seoTitle: '',
         seoDescription: '',
         seoKeywords: '',
@@ -2710,44 +2714,85 @@ export const AdminDashboardClient: React.FC = () => {
               {/* Tab: Gallery */}
               {activeProductTab === 'gallery' && (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <label className="text-[10px] font-bold uppercase text-gray-500">Gallery Banners</label>
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setMediaPickerTarget('product-gallery');
-                        setIsMediaPickerOpen(true);
-                      }}
-                      className="px-3 py-1 bg-gray-800 text-white font-bold rounded uppercase text-[9px] tracking-wider"
-                    >
-                      + Add from Media
-                    </button>
+                  {/* Main Image URL Input */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-gray-500 block">Main Image URL</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="https://mydomain.com/uploads/products/sofas/teak-sofa-1.webp"
+                        value={productForm.images[0] || ''}
+                        onChange={(e) => {
+                          const updated = [...productForm.images];
+                          updated[0] = e.target.value;
+                          setProductForm({ ...productForm, images: updated });
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                      />
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-xl border border-gray-200 min-h-36">
-                    {productForm.images.length > 0 ? (
-                      productForm.images.map((img, idx) => (
-                        <div key={idx} className="border border-gray-200 rounded-lg overflow-hidden relative bg-white group">
-                          <div className="aspect-square relative flex items-center justify-center p-1.5">
-                            <img src={img} alt="Thumb" className="object-contain max-h-full max-w-full" />
-                          </div>
-                          
-                          {/* Reordering indicators */}
-                          <div className="absolute bottom-1.5 right-1.5 flex gap-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button type="button" onClick={() => moveImage(idx, 'up')} disabled={idx === 0} className="p-1 bg-white hover:bg-gray-150 rounded border disabled:opacity-40">
-                              <ArrowUp className="w-3 h-3 text-gray-700" />
-                            </button>
-                            <button type="button" onClick={() => moveImage(idx, 'down')} disabled={idx === productForm.images.length - 1} className="p-1 bg-white hover:bg-gray-150 rounded border disabled:opacity-40">
-                              <ArrowDown className="w-3 h-3 text-gray-700" />
-                            </button>
-                            <button type="button" onClick={() => removeProductImage(idx)} className="p-1 bg-white hover:bg-red-50 text-red-500 rounded border">
-                              <X className="w-3 h-3" />
-                            </button>
-                          </div>
+                  {/* Add Gallery Image URL */}
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-gray-500 block">Add Additional Gallery Image URL</label>
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        placeholder="https://mydomain.com/uploads/products/sofas/teak-sofa-2.webp"
+                        value={newGalleryImageUrl}
+                        onChange={(e) => setNewGalleryImageUrl(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!newGalleryImageUrl.trim()) return;
+                          setProductForm({
+                            ...productForm,
+                            images: [...productForm.images, newGalleryImageUrl.trim()]
+                          });
+                          setNewGalleryImageUrl('');
+                        }}
+                        className="px-4 py-2 bg-gray-800 text-white font-bold text-xs uppercase rounded-lg whitespace-nowrap"
+                      >
+                        + Add URL
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Grid Preview and Manage */}
+                  <span className="text-[10px] font-bold uppercase text-gray-500 block mt-4">Gallery Images List</span>
+                  <div className="grid grid-cols-1 gap-2 bg-gray-50 p-4 rounded-xl border border-gray-200 max-h-60 overflow-y-auto">
+                    {productForm.images.map((img, idx) => (
+                      <div key={idx} className="flex items-center gap-3 bg-white p-2 rounded-lg border border-gray-200">
+                        <div className="w-12 h-12 relative flex items-center justify-center border border-gray-150 rounded bg-gray-50 overflow-hidden flex-shrink-0">
+                          <img src={img} alt="Thumb" className="object-contain max-h-full max-w-full" onError={(e) => { (e.target as any).src = '/logo.jpg'; }} />
                         </div>
-                      ))
-                    ) : (
-                      <div className="col-span-full py-10 text-center text-gray-400 italic">No gallery assets chosen yet.</div>
+                        <input 
+                          type="text" 
+                          value={img}
+                          onChange={(e) => {
+                            const updated = [...productForm.images];
+                            updated[idx] = e.target.value;
+                            setProductForm({ ...productForm, images: updated });
+                          }}
+                          className="flex-1 px-2 py-1 border border-gray-200 text-xs rounded font-mono text-[#121110]"
+                        />
+                        <div className="flex gap-1 flex-shrink-0">
+                          <button type="button" onClick={() => moveImage(idx, 'up')} disabled={idx === 0} className="p-1 bg-gray-50 hover:bg-gray-150 rounded border disabled:opacity-40">
+                            <ArrowUp className="w-3.5 h-3.5 text-gray-750" />
+                          </button>
+                          <button type="button" onClick={() => moveImage(idx, 'down')} disabled={idx === productForm.images.length - 1} className="p-1 bg-gray-50 hover:bg-gray-150 rounded border disabled:opacity-40">
+                            <ArrowDown className="w-3.5 h-3.5 text-gray-750" />
+                          </button>
+                          <button type="button" onClick={() => removeProductImage(idx)} className="p-1 bg-red-50 hover:bg-red-100 text-red-500 rounded border">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {productForm.images.length === 0 && (
+                      <div className="py-6 text-center text-gray-400 italic text-xs">No images added. Paste a URL above.</div>
                     )}
                   </div>
                 </div>
@@ -2810,6 +2855,15 @@ export const AdminDashboardClient: React.FC = () => {
                   <div className="space-y-3">
                     <span className="text-[10px] font-bold uppercase text-gray-500 block">Catalog Visibility & Features</span>
                     <div className="flex gap-4">
+                      <label className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
+                        <input 
+                          type="checkbox"
+                          checked={productForm.customSizeAvailable}
+                          onChange={(e) => setProductForm({ ...productForm, customSizeAvailable: e.target.checked })}
+                          className="w-4 h-4 accent-[#DE2943]"
+                        />
+                        Custom Size Available
+                      </label>
                       <label className="flex items-center gap-2 text-xs font-bold text-gray-600 cursor-pointer">
                         <input 
                           type="checkbox"
