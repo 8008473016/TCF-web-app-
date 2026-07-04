@@ -272,6 +272,46 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
+  const [uploadingProductImage, setUploadingProductImage] = useState(false);
+
+  const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number | 'append') => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
+    
+    setUploadingProductImage(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('category', productForm.category);
+
+    try {
+      const response = await api.post('/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (response.data?.success && response.data?.url) {
+        const uploadedUrl = response.data.url;
+        if (index === 'append') {
+          setProductForm({
+            ...productForm,
+            images: [...productForm.images, uploadedUrl]
+          });
+        } else {
+          const updated = [...productForm.images];
+          updated[index] = uploadedUrl;
+          setProductForm({ ...productForm, images: updated });
+        }
+        alert('Image uploaded and URL generated successfully!');
+      } else {
+        alert('Upload failed: ' + (response.data?.message || 'Unknown server error'));
+      }
+    } catch (err: any) {
+      console.error('Image upload failed:', err);
+      alert('Failed to upload image: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setUploadingProductImage(false);
+    }
+  };
+
   // Product Modal Open/Save
   const handleOpenProductModal = (product: any = null) => {
     setActiveProductTab('general');
@@ -2776,12 +2816,22 @@ export const AdminDashboardClient: React.FC = () => {
                         }}
                         className="w-full px-3 py-2 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
                       />
+                      <label className="px-4 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase rounded-lg cursor-pointer flex items-center whitespace-nowrap">
+                        {uploadingProductImage ? 'Uploading...' : 'Upload File'}
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          disabled={uploadingProductImage}
+                          onChange={(e) => handleProductImageUpload(e, 0)}
+                          className="hidden" 
+                        />
+                      </label>
                     </div>
                   </div>
 
                   {/* Add Gallery Image URL */}
                   <div className="space-y-1">
-                    <label className="text-[10px] font-bold uppercase text-gray-500 block">Add Additional Gallery Image URL</label>
+                    <label className="text-[10px] font-bold uppercase text-gray-500 block">Add Additional Gallery Image</label>
                     <div className="flex gap-2">
                       <input 
                         type="text" 
@@ -2800,10 +2850,20 @@ export const AdminDashboardClient: React.FC = () => {
                           });
                           setNewGalleryImageUrl('');
                         }}
-                        className="px-4 py-2 bg-gray-800 text-white font-bold text-xs uppercase rounded-lg whitespace-nowrap"
+                        className="px-4 py-2 bg-gray-800 text-white font-bold text-xs uppercase rounded-lg whitespace-nowrap cursor-pointer"
                       >
                         + Add URL
                       </button>
+                      <label className="px-4 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase rounded-lg cursor-pointer flex items-center whitespace-nowrap">
+                        {uploadingProductImage ? 'Uploading...' : 'Upload File'}
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          disabled={uploadingProductImage}
+                          onChange={(e) => handleProductImageUpload(e, 'append')}
+                          className="hidden" 
+                        />
+                      </label>
                     </div>
                   </div>
 
