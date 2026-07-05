@@ -19,15 +19,24 @@ async function readAnalytics(): Promise<AnalyticsData> {
   const filePath = getAnalyticsFilePath();
   try {
     const content = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(content);
+    const parsed = JSON.parse(content);
+    return {
+      visits: parsed.visits || [],
+      productViews: parsed.productViews || {},
+      ctaClicks: parsed.ctaClicks || { call: 0, whatsapp: 0, quote: 0 }
+    };
   } catch (err: any) {
+    const defaultData: AnalyticsData = { visits: [], productViews: {}, ctaClicks: { call: 0, whatsapp: 0, quote: 0 } };
     if (err.code === 'ENOENT') {
-      const defaultData: AnalyticsData = { visits: [], productViews: {}, ctaClicks: { call: 0, whatsapp: 0, quote: 0 } };
-      await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
-      return defaultData;
+      try {
+        await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
+      } catch (writeErr) {
+        console.error('Error writing default analytics file (likely directory missing), proceeding with defaults:', writeErr);
+      }
+    } else {
+      console.error('Error reading analytics file, returning empty default:', err);
     }
-    console.error('Error reading analytics file, returning empty default:', err);
-    return { visits: [], productViews: {}, ctaClicks: { call: 0, whatsapp: 0, quote: 0 } };
+    return defaultData;
   }
 }
 
