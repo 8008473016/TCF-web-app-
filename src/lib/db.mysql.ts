@@ -1,11 +1,15 @@
 import { initDatabase, getMySqlPool } from './mysql';
 
-let isInitialized = false;
+let initPromise: Promise<void> | null = null;
 async function ensureInit() {
-  if (!isInitialized) {
-    await initDatabase();
-    isInitialized = true;
+  if (!initPromise) {
+    initPromise = initDatabase().catch(err => {
+      // If it fails, allow it to be retried next time
+      initPromise = null;
+      console.error('ensureInit failed:', err);
+    });
   }
+  await initPromise;
 }
 
 const mapToMysql: Record<string, Record<string, string>> = {
