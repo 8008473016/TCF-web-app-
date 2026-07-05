@@ -7,6 +7,7 @@ import { AnalyticsTracker } from "@/components/layout/AnalyticsTracker";
 import { FloatingCTA } from "@/components/layout/FloatingCTA";
 import { QuoteRequestDialog } from "@/components/layout/QuoteRequestDialog";
 
+export const dynamic = 'force-dynamic';
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
