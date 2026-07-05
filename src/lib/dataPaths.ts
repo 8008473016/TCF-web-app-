@@ -9,4 +9,5 @@ export const dataPaths = {
   settings: path.resolve(process.cwd(), 'src/data/settings.json'),
   analytics: path.resolve(process.cwd(), 'src/data/analytics.json'),
   media: path.resolve(process.cwd(), 'src/data/media.json'),
+  reviews: path.resolve(process.cwd(), 'src/data/reviews.json'),
 };

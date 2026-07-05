@@ -722,7 +722,7 @@ export const AdminDashboardClient: React.FC = () => {
       alert('Database migrated to MySQL successfully! Reloading...');
       window.location.reload();
     } catch (err: any) {
-      alert('Migration failed: ' + (err.response?.data?.message || err.message));
+      alert('Migration failed: ' + (err.response?.data?.error || err.response?.data?.message || err.message));
     }
   };
 

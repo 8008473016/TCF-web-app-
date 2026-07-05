@@ -117,11 +117,15 @@ export const dbLocal = {
           return obj;
         });
       } catch (error) {
-        console.error(`Google Sheets Read failed for ${tableName}, falling back to local:`, error);
-        return readLocalFile((config.dataPaths as any)[tableName]);
+        console.error(`Error reading ${tableName} from Google Sheets:`, error);
+        const p = (config.dataPaths as any)[tableName];
+        if (!p) return [];
+        return readLocalFile(p);
       }
     } else {
-      return readLocalFile((config.dataPaths as any)[tableName]);
+      const p = (config.dataPaths as any)[tableName];
+      if (!p) return [];
+      return readLocalFile(p);
     }
   },
 
