@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       });
       
       if (Object.keys(settingsObj).length === 0) {
-        return NextResponse.json({ message: 'Settings not configured' }, { status: 404 });
+        return NextResponse.json({});
       }
       return NextResponse.json(settingsObj);
     }
