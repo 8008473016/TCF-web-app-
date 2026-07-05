@@ -714,6 +714,18 @@ export const AdminDashboardClient: React.FC = () => {
     reader.readAsText(backupFile);
   };
 
+  const handleMysqlMigration = async () => {
+    if (!window.confirm('WARNING: This will initialize MySQL tables and migrate current local JSON data to MySQL. Proceed?')) return;
+    try {
+      const res = await api.post('/admin/migrate');
+      console.log(res.data);
+      alert('Database migrated to MySQL successfully! Reloading...');
+      window.location.reload();
+    } catch (err: any) {
+      alert('Migration failed: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
   // Computed Lists
   const filteredProductsList = useMemo(() => {
     return products.filter(p => {
@@ -2489,6 +2501,18 @@ export const AdminDashboardClient: React.FC = () => {
                         </button>
                       </div>
                     </form>
+                  </div>
+
+                  <div className="mt-6 border border-red-200 p-5 rounded-xl bg-red-50 space-y-3">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-red-700">Production MySQL Migration</h4>
+                    <p className="text-[11px] text-red-900">Push all current local JSON data into the Hostinger MySQL database. Run this once after setting up your Hostinger database environment variables.</p>
+                    <button 
+                      type="button" 
+                      onClick={handleMysqlMigration}
+                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5 transition-colors"
+                    >
+                      Migrate to MySQL
+                    </button>
                   </div>
                 </div>
               )}

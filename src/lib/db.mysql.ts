@@ -1,4 +1,12 @@
-import { getMySqlPool } from './mysql';
+import { initDatabase, getMySqlPool } from './mysql';
+
+let isInitialized = false;
+async function ensureInit() {
+  if (!isInitialized) {
+    await initDatabase();
+    isInitialized = true;
+  }
+}
 
 const mapToMysql: Record<string, Record<string, string>> = {
   products: {
@@ -268,12 +276,14 @@ function formatFromResult(tableName: string, row: any) {
 
 export const dbMysql = {
   read: async (tableName: string): Promise<any[]> => {
+    await ensureInit();
     const db = getMySqlPool();
     const [rows] = await db.query(`SELECT * FROM \`${tableName}\``) as any[];
     return rows.map((row: any) => formatFromResult(tableName, row));
   },
 
   insert: async (tableName: string, data: any): Promise<any> => {
+    await ensureInit();
     const db = getMySqlPool();
     const formatted = formatForInsert(tableName, data);
     
@@ -290,6 +300,7 @@ export const dbMysql = {
   },
 
   update: async (tableName: string, keyField: string, keyValue: string, updateData: any): Promise<any> => {
+    await ensureInit();
     const db = getMySqlPool();
     const formatted = formatForInsert(tableName, updateData);
     
@@ -311,6 +322,7 @@ export const dbMysql = {
   },
 
   delete: async (tableName: string, keyField: string, keyValue: string): Promise<boolean> => {
+    await ensureInit();
     const db = getMySqlPool();
     const mapping = mapToMysql[tableName] || {};
     const pkCol = mapping[keyField] || keyField;
