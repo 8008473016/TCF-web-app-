@@ -43,7 +43,14 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
 
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam);
   const [selectedMaterial, setSelectedMaterial] = useState<string>('all');
-  const [maxPrice, setMaxPrice] = useState<number>(150000);
+  // Derive max price from products
+  const maxAvailablePrice = useMemo(() => {
+    if (!initialProducts || initialProducts.length === 0) return 150000;
+    const max = Math.max(...initialProducts.map((p) => p.salePrice || p.price || 0));
+    return max > 150000 ? Math.ceil(max / 50000) * 50000 : 150000;
+  }, [initialProducts]);
+
+  const [maxPrice, setMaxPrice] = useState<number>(maxAvailablePrice);
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showFilters, setShowFilters] = useState<boolean>(false);
 
@@ -51,6 +58,11 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
   useEffect(() => {
     setSelectedCategory(categoryParam);
   }, [categoryParam]);
+
+  // Sync maxPrice when products change
+  useEffect(() => {
+    setMaxPrice(maxAvailablePrice);
+  }, [maxAvailablePrice]);
 
   // Derive unique materials list
   const materials = useMemo(() => {
@@ -84,7 +96,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
   const handleResetFilters = () => {
     setSelectedCategory('all');
     setSelectedMaterial('all');
-    setMaxPrice(150000);
+    setMaxPrice(maxAvailablePrice);
     setSortBy('popular');
     router.push(pathname);
   };
@@ -237,7 +249,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
               <input
                 type="range"
                 min="5000"
-                max="150000"
+                max={maxAvailablePrice}
                 step="5000"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -245,7 +257,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
               />
               <div className="flex justify-between text-[10px] text-tcf-dark/40 font-mono">
                 <span>₹5,000</span>
-                <span>₹1,50,000</span>
+                <span>₹{maxAvailablePrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
 
