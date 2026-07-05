@@ -85,7 +85,7 @@ async function getSheetId(sheetName: string): Promise<number> {
   return sheet.properties.sheetId;
 }
 
-export const db = {
+export const dbLocal = {
   read: async (tableName: string): Promise<any[]> => {
     if (sheetsApi) {
       try {
