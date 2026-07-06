@@ -88,7 +88,7 @@ export const AdminDashboardClient: React.FC = () => {
   const [activeProductTab, setActiveProductTab] = useState<ProductTab>('general');
   const [productForm, setProductForm] = useState({
     id: '', sku: '', name: '', slug: '', category: '', description: '',
-    price: 0, salePrice: '', stock: 1, material: 'Teak Wood', dimensions: '', weight: 0,
+    price: 0, salePrice: '', stock: 1, material: '', dimensions: '', weight: 0,
     images: [] as string[], featured: false, archived: false,
     customSizeAvailable: true,
     seoTitle: '', seoDescription: '', seoKeywords: '', canonicalUrl: '',
@@ -2714,15 +2714,13 @@ export const AdminDashboardClient: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-bold uppercase text-gray-500">Wood Material</label>
-                      <select
-                        value={productForm.material}
+                      <input
+                        type="text"
+                        value={productForm.material || ''}
                         onChange={(e) => setProductForm({ ...productForm, material: e.target.value })}
+                        placeholder="e.g., Teak Wood, Glass, Metal"
                         className="w-full px-3 py-2 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
-                      >
-                        {woodMaterials.map((m) => (
-                          <option key={m} value={m}>{m}</option>
-                        ))}
-                      </select>
+                      />
                     </div>
                     <div className="space-y-1">
                       <label className="text-[10px] font-bold uppercase text-gray-500">Regular Price (₹)</label>

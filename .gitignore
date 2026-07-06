@@ -44,6 +44,7 @@ next-env.d.ts
 public/uploads/*
 !public/uploads/.gitkeep
 !public/uploads/products/
+public/uploads/products/*
 !public/uploads/products/.gitkeep
 
 # data JSON files

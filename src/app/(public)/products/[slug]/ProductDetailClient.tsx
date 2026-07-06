@@ -223,27 +223,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
               </div>
             )}
 
-            {/* Finish selection mock details */}
-            <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-tcf-dark/70 block">
-                Staining & Polish Finish
-              </label>
-              <div className="flex gap-3">
-                {['Natural Polish', 'Teak Stained Walnut', 'Warm Honey Honeycomb'].map((finish) => (
-                  <button 
-                    key={finish}
-                    onClick={() => setSelectedFinish(finish)}
-                    className={`px-3 py-2 border text-xs font-medium rounded-lg cursor-pointer transition-colors ${
-                      selectedFinish === finish 
-                        ? 'bg-tcf-red text-white border-tcf-red' 
-                        : 'bg-white border-tcf-sand text-tcf-dark/80 hover:border-tcf-red'
-                    }`}
-                  >
-                    {finish}
-                  </button>
-                ))}
-              </div>
-            </div>
+
 
             {/* Lead CTAs */}
             <div className="space-y-3 pt-3 border-t border-tcf-sand/50">
