@@ -2,8 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Phone, Mail, MapPin, ShieldCheck, Clock } from 'lucide-react';
-import { useProductStore } from '@/hooks/useProductStore';
+import { Phone, Mail, MapPin, ShieldCheck, Clock, Instagram } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   const { settings } = useProductStore();
@@ -26,9 +25,20 @@ export const Footer: React.FC = () => {
           <p className="text-sm text-tcf-dark/70 leading-relaxed font-light">
             Crafting luxury solid wood furniture in Tenali, Andhra Pradesh. Shaping heirloom masterpieces for your dream home.
           </p>
-          <div className="pt-2 flex items-center gap-1.5 text-tcf-red font-medium">
-            <ShieldCheck className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-wider">Termite Warranty</span>
+          <div className="pt-2 flex flex-col gap-3">
+            <div className="flex items-center gap-1.5 text-tcf-red font-medium">
+              <ShieldCheck className="w-5 h-5" />
+              <span className="text-xs font-bold uppercase tracking-wider">Termite Warranty</span>
+            </div>
+            <a 
+              href="https://www.instagram.com/tenali_centralfurnitures/?hl=en" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="flex items-center gap-2 text-tcf-dark hover:text-tcf-red transition-colors w-fit"
+            >
+              <Instagram className="w-5 h-5" />
+              <span className="text-sm font-semibold">Follow us on Instagram</span>
+            </a>
           </div>
         </div>
 
@@ -70,7 +80,7 @@ export const Footer: React.FC = () => {
                 <Link href="/gallery" className="hover:text-tcf-red transition-colors">Gallery</Link>
               </li>
               <li>
-                <Link href="/blogs" className="hover:text-tcf-red transition-colors">Blogs</Link>
+                <Link href="/reels" className="hover:text-tcf-red transition-colors">Reels</Link>
               </li>
             </ul>
           </div>

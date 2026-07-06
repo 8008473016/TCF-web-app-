@@ -65,8 +65,8 @@ export const BlogArticleClient: React.FC<BlogArticleClientProps> = ({
     return { headings: extractedHeadings, contentWithIds: parsedContent };
   }, [blog.content]);
 
-  const phone = settings?.contact?.phone || '+91 98765 43210';
-  const whatsapp = settings?.contact?.whatsapp || '919876543210';
+  const phone = settings?.contact?.phone || '+91 89195 46858';
+  const whatsapp = settings?.contact?.whatsapp || '918919546858';
 
   const whatsappUrl = `https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
     `Hi TCF! I read your article "${blog.title}" and would like some advice on custom wooden furniture.`

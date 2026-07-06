@@ -37,7 +37,7 @@ const getSettings = async () => {
 export default async function RefundPolicyPage() {
   const settings = await getSettings();
 
-  const phone = settings?.contact?.phone || '+91 98765 43210';
+  const phone = settings?.contact?.phone || '+91 89195 46858';
   const email = settings?.contact?.email || 'contact@tenalicentralfurniture.com';
 
   return (
@@ -127,7 +127,7 @@ export default async function RefundPolicyPage() {
                   Non-Customized Order Cancellation (Incl. Polish/ Tile change):
                 </span>
                 <ul className="space-y-1 pl-5 list-circle text-xs sm:text-sm text-tcf-dark/70 dark:text-tcf-light/70">
-                  <li>Within 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">5% Cancellation Charge</span></li>
+                  <li>Within 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">10% Cancellation Charge</span></li>
                   <li>After 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">50% Cancellation Charge</span></li>
                   <li>Shipped: <span className="font-semibold text-tcf-red">100% Cancellation Charge</span></li>
                 </ul>
@@ -137,7 +137,7 @@ export default async function RefundPolicyPage() {
                   Customized Order (Made as per specifications given at the time of placing the order):
                 </span>
                 <ul className="space-y-1 pl-5 list-circle text-xs sm:text-sm text-tcf-dark/70 dark:text-tcf-light/70">
-                  <li>Within 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">5% Cancellation Charge</span></li>
+                  <li>Within 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">10% Cancellation Charge</span></li>
                   <li>After 24 Hours: <span className="font-semibold text-tcf-dark dark:text-tcf-light">50% Cancellation Charge</span></li>
                   <li>Shipped: <span className="font-semibold text-tcf-red">100% Cancellation Charge</span></li>
                 </ul>

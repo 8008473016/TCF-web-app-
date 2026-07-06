@@ -54,7 +54,7 @@ export const Navbar: React.FC = () => {
     { name: 'Furniture', path: '/products' },
     { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
-    { name: 'Blogs', path: '/blogs' },
+    { name: 'Reels', path: '/reels' },
     { name: 'Contact', path: '/contact' }
   ];
 
@@ -135,16 +135,16 @@ export const Navbar: React.FC = () => {
                 Gallery
               </Link>
 
-              {/* Blogs */}
+              {/* Reels */}
               <Link 
-                href="/blogs" 
-                className={`text-xs font-bold uppercase tracking-wider transition-all duration-200 py-1 border-b-2 ${
-                  pathname.startsWith('/blogs') 
-                    ? 'text-tcf-red border-tcf-red' 
-                    : 'text-tcf-dark/80 hover:text-tcf-red border-transparent'
+                href="/reels" 
+                className={`text-[11px] font-bold uppercase tracking-[0.15em] transition-colors py-2 ${
+                  pathname.startsWith('/reels') 
+                    ? 'text-tcf-red border-b-2 border-tcf-red' 
+                    : 'text-tcf-dark hover:text-tcf-red'
                 }`}
               >
-                Blogs
+                Reels
               </Link>
 
               {/* About */}

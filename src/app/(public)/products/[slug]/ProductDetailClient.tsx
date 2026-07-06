@@ -67,8 +67,8 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
     ? Math.round(((product.price - product.salePrice!) / product.price) * 100)
     : 0;
 
-  const phone = settings?.contact?.phone || '+91 98765 43210';
-  const whatsapp = settings?.contact?.whatsapp || 'https://wa.me/919876543210';
+  const phone = settings?.contact?.phone || '+91 89195 46858';
+  const whatsapp = settings?.contact?.whatsapp || 'https://wa.me/918919546858';
 
   const checkDelivery = (e: React.FormEvent) => {
     e.preventDefault();
