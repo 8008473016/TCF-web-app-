@@ -20,6 +20,10 @@ export function getMySqlPool() {
 
 export async function initDatabase() {
   if (process.env.NODE_ENV !== 'production' && process.env.FORCE_MYSQL !== 'true') return;
+  if (!process.env.MYSQL_DATABASE) {
+    console.log('No MySQL database configured. Skipping MySQL init to prevent server hangs.');
+    return;
+  }
   
   const db = getMySqlPool();
   try {
