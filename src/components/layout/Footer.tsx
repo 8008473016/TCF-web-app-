@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
 
   const businessHours = settings?.contact?.hours || '09:00 AM - 09:00 PM Daily';
   const contactAddress = settings?.contact?.address || 'Opp R.C.M Chruch, Amaravathi yards,Chenchupet, Tenali,Andhra pradesh 522202';
-  const contactPhone = settings?.contact?.phone || '+91 98765 43210';
+  const contactPhone = settings?.contact?.phone || '+91 89195 46858';
   const contactEmail = settings?.contact?.email || 'contact@tenalicentralfurniture.com';
 
   return (
