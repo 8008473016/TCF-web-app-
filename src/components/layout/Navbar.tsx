@@ -46,8 +46,8 @@ export const Navbar: React.FC = () => {
     }
   };
 
-  const contactPhone = settings?.contact?.phone || '+91 98765 43210';
-  const whatsappLink = settings?.contact?.whatsapp || 'https://wa.me/919876543210';
+  const contactPhone = settings?.contact?.phone || '+91 89195 46858';
+  const whatsappLink = settings?.contact?.whatsapp || 'https://wa.me/918919546858';
 
   const menuItems = [
     { name: 'Home', path: '/' },
