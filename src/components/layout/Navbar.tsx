@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
       {/* Sticky Main Header */}
       <header className="sticky top-0 w-full bg-white/95 backdrop-blur-md border-b border-tcf-sand/80 shadow-premium transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex justify-between items-center h-20 gap-4 lg:gap-8">
             {/* Elegant Serif Logo */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center gap-3">
@@ -80,7 +80,7 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Desktop Center Navigation */}
-            <nav className="hidden lg:flex space-x-8 items-center">
+            <nav className="hidden lg:flex space-x-4 xl:space-x-8 items-center flex-1 justify-center min-w-max">
               {/* Home */}
               <Link 
                 href="/" 
@@ -173,7 +173,7 @@ export const Navbar: React.FC = () => {
             </nav>
 
             {/* CTA Highlights Buttons */}
-            <div className="hidden lg:flex items-center gap-4">
+            <div className="hidden lg:flex items-center gap-2 xl:gap-4 flex-shrink-0">
               {/* Search Trigger */}
               <button 
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
