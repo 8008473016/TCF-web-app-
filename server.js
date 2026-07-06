@@ -7,7 +7,8 @@ const next = require('next');
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
-const port = process.env.PORT || 3000;
+// Parse port as integer. If Hostinger passes a Unix socket path (string), this falls back to 3000
+const port = parseInt(process.env.PORT, 10) || 3000;
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
