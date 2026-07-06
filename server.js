@@ -1,3 +1,6 @@
+const os = require('os');
+Object.defineProperty(os, 'cpus', { value: () => [{}] }); // Force 1 CPU to prevent 120+ worker threads
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
