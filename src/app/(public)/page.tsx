@@ -59,8 +59,8 @@ export default async function HomePage() {
   const defaultBanners = [
     {
       id: "b1",
-      image: "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=1600&q=80",
-      title: "Bespoke Solid Teak Masterpieces",
+      image: "/cover-photo.jpeg",
+      title: "Idi Mana Showroom",
       subtitle: "Handcrafted in Tenali, Built for Generations",
       ctaText: "Explore Collections",
       ctaLink: "/products"
