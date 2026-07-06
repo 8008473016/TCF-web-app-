@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  experimental: {
+    cpus: 1, // Restrict build to 1 worker to prevent OOM (Out of Memory) crashes on Hostinger
+    workerThreads: false, // Prevent spawning massive thread pools on shared hosting
+  },
 };
 
 export default nextConfig;
