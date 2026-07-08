@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { initDatabase, getMySqlPool } from '@/lib/mysql';
 import { dbLocal } from '@/lib/db.local';

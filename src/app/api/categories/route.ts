@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { config } from '@/lib/config';
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
     // Map registered categories
     const formatted = categories.map(c => {
       const slug = c['Slug'] || c.slug;
-      const folderExists = physicalFolders.includes(slug);
+      const folderExists = physicalFolders.some(f => f.toLowerCase() === slug.toLowerCase());
       return {
         id: c['Category ID'] || c.id,
         name: c['Category Name'] || c.name,
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
 
     // Add unregistered physical folders
     physicalFolders.forEach(folderName => {
-      const matches = formatted.some(c => c.slug === folderName);
+      const matches = formatted.some(c => c.slug.toLowerCase() === folderName.toLowerCase());
       if (!matches) {
         formatted.push({
           id: folderName,
