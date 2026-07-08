@@ -1,5 +1,5 @@
 export const config = {
-  adminSecret: process.env.ADMIN_SECRET || 'TCFAdminMaster2026',
+  adminSecret: process.env.ADMIN_SECRET || 'admin123',
   google: {
     serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '',
     privateKey: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
