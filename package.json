@@ -6,9 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "NODE_ENV=production node server.js",
-    "lint": "eslint"
+    "lint": "eslint",
+    "import:products": "node scripts/import-products-from-folders.js"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@googleapis/drive": "^20.2.0",
     "@googleapis/sheets": "^13.0.2",
     "@hookform/resolvers": "^5.4.0",
