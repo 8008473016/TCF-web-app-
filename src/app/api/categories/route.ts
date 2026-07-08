@@ -39,8 +39,26 @@ export async function GET(req: NextRequest) {
       });
     }
 
+    let needsHeal = false;
+    
+    // Auto-heal corrupted "undefined" IDs
+    categories.forEach((c: any) => {
+      if (c['Category ID'] === 'undefined' || c.id === 'undefined') {
+        const slug = c['Slug'] || c.slug || makeSafeSlug(c['Category Name'] || 'recovered');
+        c['Category ID'] = slug;
+        c.id = slug;
+        needsHeal = true;
+      }
+    });
+
+    if (needsHeal) {
+      // Save the healed database immediately
+      const dataPath = (config.dataPaths as any)['categories'];
+      await fs.promises.writeFile(dataPath, JSON.stringify(categories, null, 2));
+    }
+
     // Map registered categories
-    const formatted = categories.map(c => {
+    const formatted = categories.map((c: any) => {
       const slug = c['Slug'] || c.slug;
       const folderExists = physicalFolders.some(f => f.toLowerCase() === slug.toLowerCase());
       return {
