@@ -313,8 +313,7 @@ export const AdminDashboardClient: React.FC = () => {
     if (!window.confirm(`Delete folder "${slug}"?`)) return;
     try {
       await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`);
-      // Immediately remove card from UI for better UX
-      setCategories(prev => prev.filter(c => c.slug !== slug));
+      // Refresh the store from the backend
       fetchCategories(true);
     } catch (error: any) {
       console.error('Failed to delete folder', error);
