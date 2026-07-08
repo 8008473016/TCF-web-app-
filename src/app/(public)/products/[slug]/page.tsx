@@ -68,7 +68,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${product.name || product['Product Name']} | Handcrafted Solid Wood Furniture | TCF`,
     description: product.seoDescription || product['SEO Description'] || `Handcrafted solid wood ${product.name || product['Product Name']} built by local artisans in Tenali. Features premium Grade-A seasoned timber, termite warranty, and customization options.`,
+    alternates: {
+      canonical: `https://tenalicentralfurniture.com/products/${slug}`,
+    },
     openGraph: {
+      title: product.seoTitle || product['SEO Title'] || `${product.name || product['Product Name']} - TCF Furniture`,
+      description: product.seoDescription || product['SEO Description'] || product.description || product['Description'],
+      images: [parsedImages[0] || "/logo.jpg"],
+      url: `https://tenalicentralfurniture.com/products/${slug}`,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
       title: product.seoTitle || product['SEO Title'] || `${product.name || product['Product Name']} - TCF Furniture`,
       description: product.seoDescription || product['SEO Description'] || product.description || product['Description'],
       images: [parsedImages[0] || "/logo.jpg"],
@@ -156,27 +167,77 @@ export default async function ProductPage({ params }: Props) {
 
   return (
     <>
-      {/* Product Rich Snippet Schema Injection */}
+      {/* Product & Breadcrumb Rich Snippet Schema Injection */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": product.name,
-            "image": product.images,
-            "description": product.description,
-            "sku": product.sku,
-            "offers": {
-              "@type": "Offer",
-              "url": `https://tenalicentralfurniture.com/products/${product.slug}`,
-              "priceCurrency": "INR",
-              "price": activePrice,
-              "itemCondition": "https://schema.org/NewCondition",
-              "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
-              "priceValidUntil": "2027-12-31"
+          __html: JSON.stringify([
+            {
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://tenalicentralfurniture.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Furniture",
+                  "item": "https://tenalicentralfurniture.com/products"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": product.category.replace('-', ' '),
+                  "item": `https://tenalicentralfurniture.com/products?category=${product.category}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 4,
+                  "name": product.name,
+                  "item": `https://tenalicentralfurniture.com/products/${product.slug}`
+                }
+              ]
+            },
+            {
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": product.name,
+              "image": product.images,
+              "description": product.description,
+              "sku": product.sku,
+              "brand": {
+                "@type": "Brand",
+                "name": "Tenali Central Furniture"
+              },
+              ...(initialReviews.length > 0 ? {
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": (initialReviews.reduce((acc, rev) => acc + rev.rating, 0) / initialReviews.length).toFixed(1),
+                  "reviewCount": initialReviews.length
+                },
+                "review": initialReviews.map(r => ({
+                  "@type": "Review",
+                  "author": { "@type": "Person", "name": r.customerName },
+                  "datePublished": r.createdAt,
+                  "reviewBody": r.reviewText,
+                  "reviewRating": { "@type": "Rating", "ratingValue": r.rating, "bestRating": "5" }
+                }))
+              } : {}),
+              "offers": {
+                "@type": "Offer",
+                "url": `https://tenalicentralfurniture.com/products/${product.slug}`,
+                "priceCurrency": "INR",
+                "price": activePrice,
+                "itemCondition": "https://schema.org/NewCondition",
+                "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+                "priceValidUntil": "2027-12-31"
+              }
             }
-          })
+          ])
         }}
       />
       <ProductDetailClient 

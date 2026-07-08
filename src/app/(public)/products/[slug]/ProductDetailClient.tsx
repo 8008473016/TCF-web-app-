@@ -147,7 +147,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
             <div className="relative border border-tcf-sand bg-tcf-light aspect-square overflow-hidden rounded-xl">
               <Image 
                 src={currentImage} 
-                alt={product.name} 
+                alt={`${product.name} - Handcrafted Solid Wood ${product.category ? product.category.replace(/-/g, ' ') : 'Furniture'}`} 
                 fill
                 priority={true}
                 className="object-cover"
@@ -173,7 +173,7 @@ export const ProductDetailClient: React.FC<ProductDetailClientProps> = ({
                   >
                     <Image 
                       src={img} 
-                      alt={`Thumbnail ${i+1}`} 
+                      alt={`${product.name} - Handcrafted Solid Wood ${product.category ? product.category.replace(/-/g, ' ') : 'Furniture'} Detail View ${i+1}`} 
                       fill 
                       sizes="150px"
                       className="object-cover" 

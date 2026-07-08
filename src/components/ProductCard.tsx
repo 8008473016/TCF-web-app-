@@ -62,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <Link href={`/products/${product.slug}`} className="block overflow-hidden relative pt-[100%] bg-tcf-light">
         <Image 
           src={imgSrc} 
-          alt={product.name} 
+          alt={`${product.name} - Handcrafted Solid Wood ${product.category ? product.category.replace(/-/g, ' ') : 'Furniture'}`} 
           fill
           sizes="(max-w-7xl) 25vw, (max-w-md) 50vw, 100vw"
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out"

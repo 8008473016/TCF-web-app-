@@ -8,7 +8,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "TCF - Tenali Central Furniture | Premium Wooden Furniture Store",
+  title: "Tenali Central Furniture",
   description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Beautiful designs, termite warranty, custom specifications.",
   keywords: ["Furniture Store", "Teak Wood Furniture", "Custom Furniture", "Tenali Central Furniture", "Vijayawada", "Guntur"],
 };

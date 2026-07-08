@@ -9,11 +9,11 @@ import { QuoteRequestDialog } from "@/components/layout/QuoteRequestDialog";
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "TCF - Tenali Central Furniture | Premium Wooden Furniture Store",
+  title: "Tenali Central Furniture",
   description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Beautiful designs, termite warranty, custom specifications.",
   keywords: ["Furniture Store", "Teak Wood Furniture", "Custom Furniture", "Tenali Central Furniture", "Vijayawada", "Guntur"],
   openGraph: {
-    title: "TCF - Tenali Central Furniture",
+    title: "Tenali Central Furniture",
     description: "Premium handcrafted solid wood furniture in Andhra Pradesh.",
     images: ["/logo.jpg"],
   }
