@@ -4,19 +4,11 @@ import { db } from '@/lib/db';
 import { config } from '@/lib/config';
 import fs from 'fs';
 import path from 'path';
+import { listProductFolders, normalizeFolderSlug, getProductUploadsDir } from '@/lib/upload-paths';
 
 const isAdmin = (req: NextRequest): boolean => {
   const token = req.headers.get('authorization') || req.headers.get('x-admin-token');
   return token === config.adminSecret;
-};
-
-const makeSafeSlug = (name: string): string => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // remove special characters
-    .replace(/\s+/g, '-')        // spaces to hyphens
-    .replace(/-+/g, '-')         // remove duplicate hyphens
-    .trim();
 };
 
 // GET /api/categories
@@ -31,19 +23,20 @@ export async function GET(req: NextRequest) {
     const isAdminRequest = url.searchParams.get('admin') === 'true';
 
     // Base formatted categories
-    const formatted = validCategories.map((c: any) => {
+    const formatted: any[] = validCategories.map((c: any) => {
       const slug = c.slug;
       return {
         databaseId: c.id ? parseInt(c.id, 10) : null,
         slug: slug,
+        folderName: '', // Initialize empty string
         name: c.name,
         description: c.description || '',
         image_url: c.image_url || '',
         banner: c.banner || '',
         status: c.status,
         sort_order: c.sort_order,
-        folderPath: `/home/u372321620/uploads/products/${slug}`,
-        publicUrl: `/uploads/products/${slug}`,
+        folderPath: `/home/u372321620/uploads/products/${slug}`, // legacy placeholder
+        publicUrl: `/uploads/products/${slug}`, // legacy placeholder
         createdAt: c.created_at,
         updatedAt: c.updated_at,
         folderExists: false, // will update if admin
@@ -54,41 +47,36 @@ export async function GET(req: NextRequest) {
 
     // Only scan folders for admin sync
     if (isAdminRequest) {
-      const uploadsDir = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
-      const productsDir = path.resolve(uploadsDir, 'products');
-      let physicalFolders: string[] = [];
-      
-      if (fs.existsSync(productsDir)) {
-        physicalFolders = fs.readdirSync(productsDir).filter(f => {
-          try {
-            return fs.statSync(path.join(productsDir, f)).isDirectory();
-          } catch {
-            return false;
-          }
-        });
-      }
+      const physicalFolders = listProductFolders();
 
       // Update folderExists and statusLabel for registered categories
       formatted.forEach((c: any) => {
-        c.folderExists = physicalFolders.some(f => f.toLowerCase() === c.slug.toLowerCase());
+        const matchedFolder = physicalFolders.find(f => f.slug === c.slug.toLowerCase());
+        c.folderExists = !!matchedFolder;
         c.statusLabel = c.folderExists ? 'FOLDER OK' : 'FOLDER MISSING';
+        if (matchedFolder) {
+          c.folderPath = matchedFolder.absolutePath;
+          c.publicUrl = matchedFolder.urlPath;
+          c.folderName = matchedFolder.folderName;
+        }
       });
 
       // Add unregistered physical folders
-      physicalFolders.forEach(folderName => {
-        const matches = formatted.some(c => c.slug.toLowerCase() === folderName.toLowerCase());
+      physicalFolders.forEach(folder => {
+        const matches = formatted.some(c => c.slug.toLowerCase() === folder.slug);
         if (!matches) {
           formatted.push({
             databaseId: null,
-            slug: folderName,
-            name: folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            slug: folder.slug,
+            folderName: folder.folderName,
+            name: folder.folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
             description: 'Physical folder with no category definition in database.',
             image_url: '',
             banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
             status: 'inactive',
             sort_order: 0,
-            folderPath: `/home/u372321620/uploads/products/${folderName}`,
-            publicUrl: `/uploads/products/${folderName}`,
+            folderPath: folder.absolutePath,
+            publicUrl: folder.urlPath,
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString(),
             folderExists: true,
@@ -120,7 +108,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Category name is required' }, { status: 400 });
     }
 
-    const slug = makeSafeSlug(c.slug || c.name);
+    const slug = normalizeFolderSlug(c.slug || c.name);
     
     if (!slug) {
       return NextResponse.json({ message: 'Valid category slug could not be generated' }, { status: 400 });

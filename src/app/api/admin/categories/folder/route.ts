@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { config } from '@/lib/config';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
-import path from 'path';
+import { resolveProductFolderPath, getProductUploadsDir, listProductFolders } from '@/lib/upload-paths';
 
 const isAdmin = (req: NextRequest): boolean => {
   const token = req.headers.get('authorization') || req.headers.get('x-admin-token');
@@ -18,42 +18,53 @@ export async function DELETE(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const slug = url.searchParams.get('slug');
+    let folderName = '';
 
-    if (!slug) {
-      return NextResponse.json({ success: false, message: 'Folder slug is required' }, { status: 400 });
-    }
-
-    // Protect against directory traversal
-    if (slug.includes('..') || slug.includes('/') || slug.includes('\\')) {
-      return NextResponse.json({ success: false, message: 'Folder is outside uploads directory' }, { status: 400 });
-    }
-
-    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.join(process.cwd(), 'public/uploads');
-    const productsDir = path.resolve(uploadRoot, 'products');
-    
-    // Find the actual physical folder name that corresponds to this slug
-    let actualFolderName = slug;
+    // Allow taking folderName from query or body
     try {
-      const folders = fs.readdirSync(productsDir);
-      for (const folder of folders) {
-        const folderSlug = folder.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim();
-        if (folderSlug === slug) {
-          actualFolderName = folder;
-          break;
-        }
+      const body = await req.json();
+      if (body.folderName) {
+        folderName = body.folderName;
       }
     } catch (err) {
-      console.error('[DELETE API] Could not read products directory to match slug:', err);
+      // Body might be empty or invalid JSON, fallback to query param later
     }
 
-    const targetDir = path.resolve(productsDir, actualFolderName);
+    if (!slug && !folderName) {
+      return NextResponse.json({ success: false, message: 'Folder slug or folderName is required' }, { status: 400 });
+    }
+
+    const searchTerm = folderName || slug || '';
+
+    // Protect against directory traversal
+    if (searchTerm.includes('..') || searchTerm.includes('/') || searchTerm.includes('\\')) {
+      return NextResponse.json({ success: false, message: 'Folder name contains invalid characters' }, { status: 400 });
+    }
+
+    const matchedFolder = resolveProductFolderPath(searchTerm);
+
+    if (!matchedFolder) {
+      // Provide robust debug data
+      const availableFolders = listProductFolders().map(f => f.folderName);
+      return NextResponse.json({ 
+        success: false, 
+        message: 'Folder does not exist.', 
+        requestedFolderName: folderName,
+        requestedSlug: slug,
+        productUploadsDir: getProductUploadsDir(),
+        availableFolders 
+      }, { status: 404 });
+    }
+
+    const targetDir = matchedFolder.absolutePath;
+    const productsDir = getProductUploadsDir();
 
     // Validate that the resolved path starts with UPLOADS_BASE_DIR/products
     if (!targetDir.startsWith(productsDir)) {
       return NextResponse.json({ success: false, message: 'Folder is outside uploads directory' }, { status: 403 });
     }
 
-    console.log('[DELETE API] Folder requested:', slug);
+    console.log('[DELETE API] Folder matched:', matchedFolder);
     console.log('[DELETE API] Resolved absolute path:', targetDir);
 
     const exists = fs.existsSync(targetDir);

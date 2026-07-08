@@ -30,6 +30,7 @@ export interface Category {
   folderExists: boolean;
   registered: boolean;
   statusLabel?: string;
+  folderName?: string;
 }
 
 export interface Blog {

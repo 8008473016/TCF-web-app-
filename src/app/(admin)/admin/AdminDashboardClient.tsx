@@ -309,10 +309,13 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
-  const handleDeleteUnregisteredFolder = async (slug: string) => {
-    if (!window.confirm(`Delete folder "${slug}"?`)) return;
+  const handleDeleteUnregisteredFolder = async (slug: string, folderName?: string) => {
+    const targetName = folderName || slug;
+    if (!window.confirm(`Delete folder "${targetName}"?`)) return;
     try {
-      await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`);
+      await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`, {
+        data: { folderName: targetName }
+      });
       // Refresh the store from the backend
       fetchCategories(true);
     } catch (error: any) {
@@ -2068,7 +2071,7 @@ export const AdminDashboardClient: React.FC = () => {
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleDeleteUnregisteredFolder(c.slug)}
+                              onClick={() => handleDeleteUnregisteredFolder(c.slug, c.folderName)}
                               className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 border border-red-200 rounded flex items-center justify-center cursor-pointer"
                               title="Delete Folder"
                             >
