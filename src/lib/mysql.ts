@@ -31,15 +31,22 @@ export async function initDatabase() {
   try {
     console.log('Initializing MySQL Database schema...');
 
+    // Note: We intentionally DROP the old categories table if it exists as a VARCHAR PK
+    // to cleanly migrate to the new INT AUTO_INCREMENT schema requested by the user.
+    await db.query(`DROP TABLE IF EXISTS categories`);
     await db.query(`
-      CREATE TABLE IF NOT EXISTS categories (
-        id VARCHAR(100) PRIMARY KEY,
+      CREATE TABLE categories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         slug VARCHAR(255) UNIQUE NOT NULL,
         description TEXT,
+        image_url TEXT,
         banner TEXT,
+        status VARCHAR(50) DEFAULT 'active',
+        sort_order INT DEFAULT 0,
         archived BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       )
     `);
 

@@ -116,7 +116,7 @@ export const AdminDashboardClient: React.FC = () => {
   // Categories CRUD state
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any | null>(null);
-  const [categoryForm, setCategoryForm] = useState({ id: '', name: '', slug: '', description: '', banner: '' });
+  const [categoryForm, setCategoryForm] = useState<{id?: string | number, name: string, slug: string, description: string, banner: string}>({ name: '', slug: '', description: '', banner: '' });
 
   // Lead coordinator logs modal
   const [viewingLead, setViewingLead] = useState<any | null>(null);
@@ -210,22 +210,21 @@ export const AdminDashboardClient: React.FC = () => {
 
   // Categories CRUD Handlers
   const handleOpenCategoryModal = (category: any = null) => {
-    if (category) {
+    if (category && category.id && !category.isUnregistered) {
       setEditingCategory(category);
       setCategoryForm({
         id: category.id,
         name: category.name || '',
         slug: category.slug || '',
         description: category.description || '',
-        banner: category.banner || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80'
+        banner: category.banner || category.image_url || 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80'
       });
     } else {
       setEditingCategory(null);
       setCategoryForm({
-        id: `CAT${Date.now()}`,
-        name: '',
-        slug: '',
-        description: '',
+        name: category?.name || '',
+        slug: category?.slug || '',
+        description: category?.description || '',
         banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80'
       });
     }
@@ -236,7 +235,8 @@ export const AdminDashboardClient: React.FC = () => {
     e.preventDefault();
     if (!categoryForm.name.trim() || !categoryForm.slug.trim()) return;
     try {
-      if (editingCategory) {
+      console.log('[FRONTEND DEBUG] Saving Category:', { isEdit: !!editingCategory, id: editingCategory?.id, form: categoryForm });
+      if (editingCategory && editingCategory.id) {
         await api.put(`/categories/${editingCategory.id}`, categoryForm);
         alert('Category updated successfully!');
       } else {
@@ -246,7 +246,7 @@ export const AdminDashboardClient: React.FC = () => {
       setIsCategoryModalOpen(false);
       fetchCategories();
     } catch (error: any) {
-      console.error(error);
+      console.error('[FRONTEND DEBUG] Category Save Error:', error);
       alert(`Failed to save category: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
     }
   };

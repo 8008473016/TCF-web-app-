@@ -29,19 +29,25 @@ export async function DELETE(
   }
 
   try {
-    const { id: categoryId } = await params;
+    const { id: rawId } = await params;
+    const categoryId = parseInt(rawId, 10);
+    
+    if (isNaN(categoryId) || categoryId <= 0) {
+      return NextResponse.json({ message: 'Invalid category ID format' }, { status: 400 });
+    }
+
     const url = new URL(req.url);
     const deleteFolder = url.searchParams.get('deleteFolder') === 'true';
 
     // Get the category details to know the slug before deleting
     const categories = await db.read('categories');
-    const category = categories.find(c => (c.id || c['Category ID']) === categoryId);
+    const category = categories.find((c: any) => parseInt(c.id, 10) === categoryId);
 
-    const success = await db.delete('categories', 'Category ID', categoryId);
+    const success = await db.delete('categories', 'id', String(categoryId));
     if (success) {
       if (deleteFolder && category) {
-        const slug = category.slug || category['Slug'];
-        const uploadRoot = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
+        const slug = category.slug;
+        const uploadRoot = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
         const targetDir = path.resolve(uploadRoot, 'products', slug);
         if (fs.existsSync(targetDir)) {
           fs.rmSync(targetDir, { recursive: true, force: true });
@@ -66,27 +72,33 @@ export async function PUT(
   }
 
   try {
-    const { id: categoryId } = await params;
-    const body = await req.json();
+    const { id: rawId } = await params;
     
-    if (categoryId === 'undefined' || !categoryId) {
+    if (!rawId || rawId === 'undefined' || rawId === 'null') {
       return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
     }
-
+    
     // Check if the PUT is specifically a request to just create/ensure the directory exists
+    // This is for physical unregistered folders
+    const body = await req.json();
     const ensureFolderOnly = body.action === 'create-folder';
 
-    const slug = makeSafeSlug(body.slug || body.name || categoryId);
+    const categoryId = parseInt(rawId, 10);
+    if (!ensureFolderOnly && (isNaN(categoryId) || categoryId <= 0)) {
+      return NextResponse.json({ message: 'Invalid category ID: must be an integer' }, { status: 400 });
+    }
+
+    const slug = makeSafeSlug(body.slug || body.name || rawId);
     
-    // Automatically create category folder inside public/uploads
-    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
+    // Automatically create category folder inside absolute uploads dir
+    const uploadRoot = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
     const targetDir = path.resolve(uploadRoot, 'products', slug);
     if (!fs.existsSync(targetDir)) {
       try {
         fs.mkdirSync(targetDir, { recursive: true });
       } catch (err: any) {
         return NextResponse.json({ 
-          message: 'Failed to create physical folder due to permission error', 
+          message: 'Failed to create physical folder', 
           error: err.message 
         }, { status: 500 });
       }
@@ -96,37 +108,25 @@ export async function PUT(
       return NextResponse.json({ message: 'Folder created successfully' });
     }
 
-    const folderPath = `public/uploads/products/${slug}`;
-    const publicUrl = `/uploads/products/${slug}`;
-
     const updatedCategory = {
-      'Category ID': categoryId,
-      'Category Name': body.name,
-      'Slug': slug,
-      'Description': body.description || '',
-      'Banner': body.banner || '',
-      'id': categoryId,
-      'name': body.name,
-      'slug': slug,
-      'folderPath': folderPath,
-      'publicUrl': publicUrl,
-      'createdAt': body.createdAt || new Date().toISOString(),
-      'updatedAt': new Date().toISOString()
+      name: body.name,
+      slug: slug,
+      description: body.description || '',
+      image_url: body.image_url || body.banner || '',
+      banner: body.banner || body.image_url || '',
+      status: body.status || 'active',
+      sort_order: body.sort_order || 0
     };
 
-    // Check if category exists in JSON to decide update or insert (upsert)
-    const categories = await db.read('categories');
-    const exists = categories.some((item: any) => String(item.id || item['Category ID']) === String(categoryId));
+    // Note: this explicitly calls update, it will NOT upsert.
+    // If the category does not exist, it will just affect 0 rows or throw.
+    console.log(`[API DEBUG] Updating category ID ${categoryId}:`, updatedCategory);
+    
+    await db.update('categories', 'id', String(categoryId), updatedCategory);
+    return NextResponse.json({ success: true, message: 'Category updated successfully' });
 
-    if (exists) {
-      await db.update('categories', 'Category ID', categoryId, updatedCategory);
-      return NextResponse.json({ success: true, message: 'Category updated successfully' });
-    } else {
-      await db.insert('categories', updatedCategory);
-      return NextResponse.json({ success: true, message: 'Category created and registered successfully' });
-    }
   } catch (error: any) {
-    console.error(`[API ERROR] Category update failed for category ${params}:`, error);
-    return NextResponse.json({ success: false, message: 'Error updating/creating category', error: error.message }, { status: 500 });
+    console.error(`[API ERROR] Category update failed:`, error);
+    return NextResponse.json({ success: false, message: 'Error updating category', error: error.message }, { status: 500 });
   }
 }
