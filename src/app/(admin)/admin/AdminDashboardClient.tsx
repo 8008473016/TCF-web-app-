@@ -309,6 +309,18 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
+  const handleDeleteUnregisteredFolder = async (slug: string) => {
+    if (!window.confirm(`Are you sure you want to delete the unregistered physical folder "${slug}"? This action is irreversible and will delete all images inside it.`)) return;
+    try {
+      await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`);
+      fetchCategories(true);
+      alert('Folder deleted successfully.');
+    } catch (error: any) {
+      console.error('Failed to delete folder', error);
+      alert('Failed to delete folder.');
+    }
+  };
+
   const handleCreateCategoryFolder = async (c: any) => {
     try {
       await api.put(`/categories/${c.databaseId}`, c);
@@ -2045,13 +2057,23 @@ export const AdminDashboardClient: React.FC = () => {
                         
                         {/* Folder Status Actions */}
                         {!c.registered ? (
-                          <button
-                            type="button"
-                            onClick={() => handleRegisterFolder(c.slug)}
-                            className="mt-2 w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
-                          >
-                            Register as Category
-                          </button>
+                          <div className="mt-2 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleRegisterFolder(c.slug)}
+                              className="w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
+                            >
+                              Register as Category
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteUnregisteredFolder(c.slug)}
+                              className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 border border-red-200 rounded flex items-center justify-center cursor-pointer"
+                              title="Delete Folder"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         ) : !c.folderExists ? (
                           <button
                             type="button"
