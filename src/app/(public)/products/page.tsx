@@ -15,7 +15,7 @@ export default async function ProductsPage() {
 
   // Format categories
   const formattedCategories = categories.map((c: any) => ({
-    id: String(c.id || c['Category ID'] || ''),
+    id: String(c.databaseId || c.slug || c['Category ID'] || ''),
     name: String(c.name || c['Category Name'] || ''),
     slug: String(c.slug || c['Slug'] || ''),
     description: String(c.description || c['Description'] || '')

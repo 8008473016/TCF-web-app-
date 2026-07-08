@@ -21,13 +21,14 @@ export interface Product {
 }
 
 export interface Category {
-  id: string;
+  databaseId: number | null;
   name: string;
   slug: string;
   description: string;
   banner: string;
-  folderExists?: boolean;
-  isUnregistered?: boolean;
+  image_url?: string;
+  folderExists: boolean;
+  registered: boolean;
 }
 
 export interface Blog {

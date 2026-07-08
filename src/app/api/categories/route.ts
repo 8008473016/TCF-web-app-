@@ -44,9 +44,9 @@ export async function GET(req: NextRequest) {
       const slug = c.slug;
       const folderExists = physicalFolders.some(f => f.toLowerCase() === slug?.toLowerCase());
       return {
-        id: c.id,
-        name: c.name,
+        databaseId: c.id ? parseInt(c.id, 10) : null,
         slug: slug,
+        name: c.name,
         description: c.description,
         image_url: c.image_url,
         banner: c.banner,
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
         createdAt: c.created_at,
         updatedAt: c.updated_at,
         folderExists: folderExists,
-        isUnregistered: false
+        registered: true
       };
     });
 
@@ -66,9 +66,9 @@ export async function GET(req: NextRequest) {
       const matches = formatted.some(c => c.slug?.toLowerCase() === folderName.toLowerCase());
       if (!matches) {
         formatted.push({
-          id: `unregistered-${folderName}`, // Just for frontend keying
-          name: folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+          databaseId: null,
           slug: folderName,
+          name: folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
           description: 'Physical folder with no category definition in database.',
           image_url: '',
           banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           folderExists: true,
-          isUnregistered: true
+          registered: false
         });
       }
     });

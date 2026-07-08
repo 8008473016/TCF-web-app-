@@ -78,16 +78,12 @@ export async function PUT(
       return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
     }
     
-    // Check if the PUT is specifically a request to just create/ensure the directory exists
-    // This is for physical unregistered folders
-    const body = await req.json();
-    const ensureFolderOnly = body.action === 'create-folder';
-
     const categoryId = parseInt(rawId, 10);
-    if (!ensureFolderOnly && (isNaN(categoryId) || categoryId <= 0)) {
+    if (isNaN(categoryId) || categoryId <= 0) {
       return NextResponse.json({ message: 'Invalid category ID: must be an integer' }, { status: 400 });
     }
 
+    const body = await req.json();
     const slug = makeSafeSlug(body.slug || body.name || rawId);
     
     // Automatically create category folder inside absolute uploads dir
@@ -102,10 +98,6 @@ export async function PUT(
           error: err.message 
         }, { status: 500 });
       }
-    }
-
-    if (ensureFolderOnly) {
-      return NextResponse.json({ message: 'Folder created successfully' });
     }
 
     const updatedCategory = {

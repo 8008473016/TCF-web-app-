@@ -101,7 +101,7 @@ export const Navbar: React.FC = () => {
                 <div className="absolute left-0 mt-2 w-64 bg-white border border-tcf-sand shadow-luxury opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 grid grid-cols-1 p-2 rounded-xl">
                   {categories.map((cat) => (
                     <Link 
-                      key={cat.id} 
+                      key={cat.databaseId || cat.slug} 
                       href={`/products?category=${cat.slug}`}
                       className="px-4 py-2.5 text-xs hover:bg-tcf-light text-tcf-dark/80 hover:text-tcf-red font-medium rounded-lg transition-colors"
                     >
@@ -277,7 +277,7 @@ export const Navbar: React.FC = () => {
             <div className="grid grid-cols-2 gap-2 pl-2">
               {categories.slice(0, 6).map((cat) => (
                 <Link 
-                  key={cat.id} 
+                  key={cat.databaseId || cat.slug} 
                   href={`/products?category=${cat.slug}`}
                   className="block text-xs font-medium text-tcf-dark/70 hover:text-tcf-red py-1"
                 >

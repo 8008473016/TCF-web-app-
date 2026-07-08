@@ -21,7 +21,8 @@ interface Product {
 }
 
 interface Category {
-  id: string;
+  databaseId?: number | null;
+  id?: string;
   name: string;
   slug: string;
   description: string;
@@ -180,7 +181,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({
                 </button>
                 {categories.map((cat) => (
                   <button
-                    key={cat.id}
+                    key={cat.databaseId || cat.slug}
                     onClick={() => handleCategorySelect(cat.slug)}
                     className={`text-left text-sm font-medium transition-colors cursor-pointer ${
                       selectedCategory === cat.slug ? 'text-tcf-red font-semibold' : 'text-tcf-dark/80 hover:text-tcf-red'

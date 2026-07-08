@@ -189,7 +189,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.slice(0, 8).map((cat: any) => (
             <Link 
-              key={cat.id || cat['Category ID']} 
+              key={cat.databaseId || cat.slug || cat['Category ID']} 
               href={`/products?category=${cat.slug || cat['Slug']}`}
               className="group relative h-64 overflow-hidden border border-tcf-sand hover:shadow-premium bg-tcf-dark rounded-2xl"
             >
