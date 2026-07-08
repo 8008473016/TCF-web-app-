@@ -24,65 +24,80 @@ export async function GET(req: NextRequest) {
   try {
     const categories = await db.read('categories');
     
-    // Scan uploads directory for products folders
-    const uploadsDir = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
-    const productsDir = path.resolve(uploadsDir, 'products');
-    let physicalFolders: string[] = [];
-    
-    if (fs.existsSync(productsDir)) {
-      physicalFolders = fs.readdirSync(productsDir).filter(f => {
-        try {
-          return fs.statSync(path.join(productsDir, f)).isDirectory();
-        } catch {
-          return false;
-        }
-      });
-    }
+    // Filter invalid categories
+    const validCategories = categories.filter((c: any) => c.name && c.slug && c.slug.trim() !== '');
 
-    // Map registered categories
-    const formatted = categories.map((c: any) => {
+    const url = new URL(req.url);
+    const isAdminRequest = url.searchParams.get('admin') === 'true';
+
+    // Base formatted categories
+    const formatted = validCategories.map((c: any) => {
       const slug = c.slug;
-      const folderExists = physicalFolders.some(f => f.toLowerCase() === slug?.toLowerCase());
       return {
         databaseId: c.id ? parseInt(c.id, 10) : null,
         slug: slug,
         name: c.name,
-        description: c.description,
-        image_url: c.image_url,
-        banner: c.banner,
+        description: c.description || '',
+        image_url: c.image_url || '',
+        banner: c.banner || '',
         status: c.status,
         sort_order: c.sort_order,
-        folderPath: `public/uploads/products/${slug}`,
+        folderPath: `/home/u372321620/uploads/products/${slug}`,
         publicUrl: `/uploads/products/${slug}`,
         createdAt: c.created_at,
         updatedAt: c.updated_at,
-        folderExists: folderExists,
-        registered: true
+        folderExists: false, // will update if admin
+        registered: true,
+        statusLabel: 'FOLDER MISSING' // will update if admin
       };
     });
 
-    // Add unregistered physical folders
-    physicalFolders.forEach(folderName => {
-      const matches = formatted.some(c => c.slug?.toLowerCase() === folderName.toLowerCase());
-      if (!matches) {
-        formatted.push({
-          databaseId: null,
-          slug: folderName,
-          name: folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-          description: 'Physical folder with no category definition in database.',
-          image_url: '',
-          banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
-          status: 'inactive',
-          sort_order: 0,
-          folderPath: `public/uploads/products/${folderName}`,
-          publicUrl: `/uploads/products/${folderName}`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          folderExists: true,
-          registered: false
+    // Only scan folders for admin sync
+    if (isAdminRequest) {
+      const uploadsDir = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
+      const productsDir = path.resolve(uploadsDir, 'products');
+      let physicalFolders: string[] = [];
+      
+      if (fs.existsSync(productsDir)) {
+        physicalFolders = fs.readdirSync(productsDir).filter(f => {
+          try {
+            return fs.statSync(path.join(productsDir, f)).isDirectory();
+          } catch {
+            return false;
+          }
         });
       }
-    });
+
+      // Update folderExists and statusLabel for registered categories
+      formatted.forEach((c: any) => {
+        c.folderExists = physicalFolders.some(f => f.toLowerCase() === c.slug.toLowerCase());
+        c.statusLabel = c.folderExists ? 'FOLDER OK' : 'FOLDER MISSING';
+      });
+
+      // Add unregistered physical folders
+      physicalFolders.forEach(folderName => {
+        const matches = formatted.some(c => c.slug.toLowerCase() === folderName.toLowerCase());
+        if (!matches) {
+          formatted.push({
+            databaseId: null,
+            slug: folderName,
+            name: folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            description: 'Physical folder with no category definition in database.',
+            image_url: '',
+            banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
+            status: 'inactive',
+            sort_order: 0,
+            folderPath: `/home/u372321620/uploads/products/${folderName}`,
+            publicUrl: `/uploads/products/${folderName}`,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            folderExists: true,
+            registered: false,
+            statusLabel: 'UNREGISTERED FOLDER'
+          });
+        }
+      });
+    }
 
     return NextResponse.json(formatted);
   } catch (error: any) {
@@ -101,11 +116,15 @@ export async function POST(req: NextRequest) {
     const c = await req.json();
     console.log('[API DEBUG] POST /api/categories called for Create Mode', c);
     
-    if (!c.name) {
+    if (!c.name || c.name.trim() === '') {
       return NextResponse.json({ message: 'Category name is required' }, { status: 400 });
     }
 
     const slug = makeSafeSlug(c.slug || c.name);
+    
+    if (!slug) {
+      return NextResponse.json({ message: 'Valid category slug could not be generated' }, { status: 400 });
+    }
     
     // Automatically create category folder inside absolute uploads dir
     const uploadRoot = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";

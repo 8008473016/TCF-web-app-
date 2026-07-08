@@ -29,6 +29,7 @@ export interface Category {
   image_url?: string;
   folderExists: boolean;
   registered: boolean;
+  statusLabel?: string;
 }
 
 export interface Blog {
@@ -75,7 +76,7 @@ interface ProductState {
   loading: boolean;
   
   fetchProducts: () => Promise<void>;
-  fetchCategories: () => Promise<void>;
+  fetchCategories: (admin?: boolean) => Promise<void>;
   fetchBlogs: () => Promise<void>;
   fetchSettings: () => Promise<void>;
   
@@ -103,9 +104,10 @@ export const useProductStore = create<ProductState>((set) => ({
     }
   },
 
-  fetchCategories: async () => {
+  fetchCategories: async (admin = false) => {
     try {
-      const response = await api.get('/categories');
+      const endpoint = admin ? '/categories?admin=true' : '/categories';
+      const response = await api.get(endpoint);
       set({ categories: response.data });
     } catch (error) {
       console.error('Error fetching categories:', error);

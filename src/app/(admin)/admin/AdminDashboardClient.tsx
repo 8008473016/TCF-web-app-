@@ -127,7 +127,7 @@ export const AdminDashboardClient: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchCategories();
+      fetchCategories(true);
       fetchAllAdminData();
     }
   }, [isAuthenticated]);
@@ -238,7 +238,7 @@ export const AdminDashboardClient: React.FC = () => {
       console.log(`[FRONTEND DEBUG] Registering folder: ${slug}`);
       await api.post('/categories/register-folder', { slug });
       alert('Folder registered as category successfully!');
-      fetchCategories();
+      fetchCategories(true);
     } catch (error: any) {
       console.error('[FRONTEND DEBUG] Folder Registration Error:', error);
       alert(`Failed to register folder: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
@@ -266,7 +266,7 @@ export const AdminDashboardClient: React.FC = () => {
         alert('Category added successfully!');
       }
       setIsCategoryModalOpen(false);
-      fetchCategories();
+      fetchCategories(true);
     } catch (error: any) {
       console.error('[FRONTEND DEBUG] Category Save Error:', error);
       alert(`Failed to save category: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
@@ -278,7 +278,7 @@ export const AdminDashboardClient: React.FC = () => {
     const deleteFolder = window.confirm('Do you also want to delete the physical folder and all of its images on the server? (Warning: This action is irreversible)');
     try {
       await api.delete(`/categories/${id}?deleteFolder=${deleteFolder}`);
-      fetchCategories();
+      fetchCategories(true);
       alert('Category deleted successfully.');
     } catch {
       alert('Failed to delete category.');
@@ -288,7 +288,7 @@ export const AdminDashboardClient: React.FC = () => {
   const handleCreateCategoryFolder = async (c: any) => {
     try {
       await api.put(`/categories/${c.databaseId}`, c);
-      fetchCategories();
+      fetchCategories(true);
       alert('Physical folder created successfully!');
     } catch {
       alert('Failed to create category folder.');
