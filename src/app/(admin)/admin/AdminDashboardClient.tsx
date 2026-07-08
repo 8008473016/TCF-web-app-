@@ -310,14 +310,16 @@ export const AdminDashboardClient: React.FC = () => {
   };
 
   const handleDeleteUnregisteredFolder = async (slug: string) => {
-    if (!window.confirm(`Are you sure you want to delete the unregistered physical folder "${slug}"? This action is irreversible and will delete all images inside it.`)) return;
+    if (!window.confirm(`Delete folder "${slug}"?`)) return;
     try {
       await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`);
+      // Immediately remove card from UI for better UX
+      setCategories(prev => prev.filter(c => c.slug !== slug));
       fetchCategories(true);
-      alert('Folder deleted successfully.');
     } catch (error: any) {
       console.error('Failed to delete folder', error);
-      alert('Failed to delete folder.');
+      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Unknown error occurred';
+      alert(`Failed to delete folder: ${errorMessage}`);
     }
   };
 
