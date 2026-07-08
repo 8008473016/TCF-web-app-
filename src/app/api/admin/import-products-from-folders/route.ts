@@ -17,7 +17,23 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { stdout, stderr } = await execAsync('node scripts/import-products-from-folders.js');
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch (e) {
+      // Ignore if no body provided
+    }
+
+    const action = body.action || 'sync';
+    let command = 'node scripts/import-products-from-folders.js';
+    
+    if (action === 'generate_missing') {
+      command += ' --generate-missing';
+    } else if (action === 'regenerate_all') {
+      command += ' --regenerate-all';
+    }
+
+    const { stdout, stderr } = await execAsync(command);
     const output = stdout.toString();
     
     const resultMatch = output.match(/--- IMPORT COMPLETE ---\n(\{[\s\S]+\})/);

@@ -59,11 +59,13 @@ const generateProductData = async (productName, categoryName) => {
     estimated_price_range: 'Contact for price',
     seo_title: `${productName} - Custom Handcrafted Furniture`,
     seo_description: `Discover the premium ${productName}. Custom sizes available. Contact for exact pricing.`,
-    tags: [categoryName.toLowerCase(), 'furniture']
+    tags: [categoryName.toLowerCase(), 'furniture'],
+    ai_generated: false
   };
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
+    console.warn(`[GEMINI] No API key found. Using safe defaults for ${productName}`);
     return defaultData;
   }
 
@@ -86,19 +88,27 @@ Return ONLY a valid JSON object with these exact keys:
     let text = result.response.text();
     text = text.replace(/```json/gi, '').replace(/```/gi, '').trim();
     const parsed = JSON.parse(text);
-    return { ...defaultData, ...parsed };
+    return { ...defaultData, ...parsed, ai_generated: true };
   } catch (error) {
     console.warn(`[GEMINI ERROR] Failed for ${productName}:`, error.message);
-    return defaultData;
+    return defaultData; // Falls back to ai_generated: false
   }
 };
 
 async function runImport() {
+  const args = process.argv.slice(2);
+  let action = 'sync'; // sync, generate_missing, regenerate_all
+
+  if (args.includes('--generate-missing')) action = 'generate_missing';
+  if (args.includes('--regenerate-all')) action = 'regenerate_all';
+
   const results = {
+    action,
     categoriesCreated: 0,
     categoriesExisting: 0,
     productsCreated: 0,
     productsSkipped: 0,
+    productsGenerated: 0,
     imagesCreated: 0,
     errors: []
   };
@@ -111,58 +121,56 @@ async function runImport() {
   const db = getDbPool();
 
   try {
-    // 1. Safely create tables
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS categories (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) UNIQUE NOT NULL,
-        description TEXT,
-        image_url TEXT,
-        banner TEXT,
-        status VARCHAR(50) DEFAULT 'active',
-        sort_order INT DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
+    // Schema safe updates
+    try {
+      await db.query(`ALTER TABLE products ADD COLUMN ai_generated BOOLEAN DEFAULT FALSE`);
+      await db.query(`ALTER TABLE products ADD COLUMN ai_generated_at DATETIME`);
+    } catch (e) {
+      // Ignore if columns already exist
+    }
 
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS products (
-        id VARCHAR(100) PRIMARY KEY,
-        sku VARCHAR(100),
-        name VARCHAR(255) NOT NULL,
-        slug VARCHAR(255) UNIQUE NOT NULL,
-        category VARCHAR(100),
-        description TEXT,
-        price DECIMAL(10,2) DEFAULT 0,
-        sale_price DECIMAL(10,2),
-        stock INT DEFAULT 0,
-        material VARCHAR(255),
-        dimensions VARCHAR(255),
-        weight DECIMAL(10,2) DEFAULT 0,
-        images JSON,
-        featured BOOLEAN DEFAULT FALSE,
-        archived BOOLEAN DEFAULT FALSE,
-        seo_title VARCHAR(255),
-        seo_description TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
+    if (action === 'generate_missing' || action === 'regenerate_all') {
+      console.log(`Starting AI Generation Mode: ${action}`);
+      const query = action === 'generate_missing' 
+        ? 'SELECT id, name, category, slug FROM products WHERE ai_generated = FALSE OR ai_generated IS NULL'
+        : 'SELECT id, name, category, slug FROM products';
+        
+      const [products] = await db.query(query);
+      console.log(`Found ${products.length} products to generate AI details for...`);
 
-    await db.query(`
-      CREATE TABLE IF NOT EXISTS product_images (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        product_id VARCHAR(100),
-        image_url TEXT,
-        alt_text VARCHAR(255),
-        sort_order INT DEFAULT 0,
-        is_primary BOOLEAN DEFAULT FALSE,
-        UNIQUE KEY idx_unique_image (product_id, image_url(255))
-      )
-    `);
+      for (const prod of products) {
+        console.log(`-> Generating for ${prod.name}...`);
+        
+        // Fetch category name
+        let catName = prod.category;
+        try {
+          const [cat] = await db.query('SELECT name FROM categories WHERE slug = ?', [prod.category]);
+          if (cat.length > 0) catName = cat[0].name;
+        } catch(e) {}
 
-    // 2. Locate uploads directory
+        const details = await generateProductData(prod.name, catName);
+        if (details.ai_generated) {
+           await db.query(`
+             UPDATE products SET 
+               description = ?, 
+               material = ?, 
+               dimensions = ?, 
+               seo_title = ?, 
+               seo_description = ?, 
+               ai_generated = TRUE, 
+               ai_generated_at = NOW() 
+             WHERE id = ?`,
+             [details.full_description, details.material, details.size, details.seo_title, details.seo_description, prod.id]
+           );
+           results.productsGenerated++;
+        }
+      }
+      console.log('\n--- IMPORT COMPLETE ---');
+      console.log(JSON.stringify(results, null, 2));
+      return;
+    }
+
+    // Default 'sync' folder import
     let productsDir = process.env.PRODUCT_UPLOADS_DIR;
     if (!productsDir || !fs.existsSync(productsDir)) {
       productsDir = path.join(process.cwd(), 'public/uploads/Products');
@@ -175,7 +183,6 @@ async function runImport() {
       throw new Error(`Products directory not found at ${productsDir}`);
     }
 
-    // 3. Scan Folders
     const physicalFolders = fs.readdirSync(productsDir).filter(f => {
       try {
         return fs.statSync(path.join(productsDir, f)).isDirectory() && !IGNORED_FOLDERS.includes(f.toLowerCase());
@@ -192,7 +199,6 @@ async function runImport() {
       
       let categoryId = null;
 
-      // Category Import
       try {
         const [existingCategory] = await db.query('SELECT id FROM categories WHERE slug = ?', [categorySlug]);
         if (existingCategory.length > 0) {
@@ -212,7 +218,6 @@ async function runImport() {
         continue; 
       }
 
-      // Product Import
       const folderPath = path.join(productsDir, folderName);
       const files = fs.readdirSync(folderPath).filter(f => {
         const ext = path.extname(f).toLowerCase();
@@ -224,9 +229,6 @@ async function runImport() {
         const baseName = path.basename(file, ext);
         const productName = formatName(baseName);
         const productSlug = makeSafeSlug(`${categorySlug}-${baseName}`);
-        
-        // Retain original capitalization for Hostinger Linux paths
-        // Do NOT lowercase folderName or file here, as Linux is case-sensitive
         const imageUrl = `/uploads/Products/${folderName}/${file}`; 
 
         let productId = null;
@@ -238,7 +240,6 @@ async function runImport() {
             productId = existingProduct[0].id;
             results.productsSkipped++;
 
-            // Update legacy images JSON if missing
             try {
               let legacyImages = [];
               if (existingProduct[0].images) {
@@ -256,9 +257,11 @@ async function runImport() {
             productId = crypto.randomUUID();
             const legacyImagesJson = JSON.stringify([imageUrl]);
             
+            const aiGeneratedVal = details.ai_generated ? 1 : 0;
+            
             await db.query(
-              `INSERT INTO products (id, name, slug, category, description, price, featured, status, images, material, dimensions, weight, stock, seo_title, seo_description) 
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              `INSERT INTO products (id, name, slug, category, description, price, featured, status, images, material, dimensions, weight, stock, seo_title, seo_description, ai_generated, ai_generated_at) 
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
               [
                 productId,
                 productName,
@@ -274,10 +277,12 @@ async function runImport() {
                 0,
                 0,
                 details.seo_title,
-                details.seo_description
+                details.seo_description,
+                aiGeneratedVal
               ]
             );
             results.productsCreated++;
+            if (aiGeneratedVal) results.productsGenerated++;
             console.log(`  + Created product: ${productName}`);
           }
         } catch (err) {
@@ -285,7 +290,6 @@ async function runImport() {
           continue;
         }
 
-        // Product Images Table Import
         try {
           const [existingImage] = await db.query('SELECT id FROM product_images WHERE product_id = ? AND image_url = ?', [productId, imageUrl]);
           if (existingImage.length === 0) {
@@ -296,7 +300,6 @@ async function runImport() {
             results.imagesCreated++;
           }
         } catch (err) {
-          // Ignore unique constraint violations gracefully
           if (err.code !== 'ER_DUP_ENTRY') {
             results.errors.push(`Image error [${file}]: ${err.message}`);
           }

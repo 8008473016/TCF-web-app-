@@ -295,18 +295,26 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
-  const handleImportFromFolders = async () => {
-    if (!window.confirm('Are you sure you want to run the first-time folder import? This will scan public/uploads/products and automatically create categories and products.')) return;
+  const handleImportAction = async (actionStr: string) => {
+    let msg = 'Are you sure you want to run the folder sync?';
+    if (actionStr === 'generate_missing') msg = 'Are you sure you want to generate missing AI details? This will consume Gemini quota.';
+    if (actionStr === 'regenerate_all') msg = 'Are you sure you want to regenerate ALL AI details? This will OVERWRITE existing text and consume lots of Gemini quota!';
+
+    if (!window.confirm(msg)) return;
     try {
-      alert('Importing products... Please wait, this might take a moment.');
-      const response = await api.post('/admin/import-products-from-folders');
+      alert(`Processing ${actionStr}... Please wait, this might take a moment.`);
+      const response = await api.post('/admin/import-products-from-folders', { action: actionStr });
       const res = response.data.results;
-      alert(`Import complete!\nCategories Created: ${res.categoriesCreated}\nCategories Existing: ${res.categoriesExisting}\nProducts Created: ${res.productsCreated}\nProducts Skipped (already exist): ${res.productsSkipped}\nImages Registered: ${res.imagesCreated}`);
+      if (actionStr === 'sync') {
+        alert(`Import complete!\nCategories Created: ${res.categoriesCreated}\nProducts Created: ${res.productsCreated}\nProducts Skipped: ${res.productsSkipped}\nImages Registered: ${res.imagesCreated}`);
+      } else {
+        alert(`AI Generation complete!\nProducts Generated: ${res.productsGenerated}`);
+      }
       fetchCategories(true);
       fetchAllAdminData();
     } catch (error: any) {
-      console.error('[FRONTEND ERROR] Folder import failed:', error);
-      alert(`Failed to import from folders: ${error.response?.data?.message || error.message}`);
+      console.error('[FRONTEND ERROR] Action failed:', error);
+      alert(`Failed to perform action: ${error.response?.data?.message || error.message}`);
     }
   };
 
@@ -1676,13 +1684,27 @@ export const AdminDashboardClient: React.FC = () => {
                           <h2 className="text-xl font-serif font-bold text-[#121110]">Showroom Categories</h2>
                           <p className="text-xs text-gray-500 font-mono">Add, edit details, upload banners, or delete categories used in the showroom catalogue.</p>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2">
                           <button
                             type="button"
-                            onClick={() => handleImportFromFolders()}
+                            onClick={() => handleImportAction('sync')}
                             className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
                           >
-                            <Download className="w-4 h-4" /> Import From Folders
+                            <Download className="w-4 h-4" /> Sync Folders
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleImportAction('generate_missing')}
+                            className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                          >
+                            <RefreshCw className="w-4 h-4" /> Generate AI Details
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleImportAction('regenerate_all')}
+                            className="px-3.5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                          >
+                            <RotateCcw className="w-4 h-4" /> Regenerate AI Details
                           </button>
                           <button
                             type="button"

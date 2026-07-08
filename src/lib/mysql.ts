@@ -65,6 +65,8 @@ export async function initDatabase() {
         archived BOOLEAN DEFAULT FALSE,
         seo_title VARCHAR(255),
         seo_description TEXT,
+        ai_generated BOOLEAN DEFAULT FALSE,
+        ai_generated_at DATETIME,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
