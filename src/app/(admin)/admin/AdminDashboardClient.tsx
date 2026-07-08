@@ -1936,7 +1936,7 @@ export const AdminDashboardClient: React.FC = () => {
                         {c.isUnregistered ? (
                           <button
                             type="button"
-                            onClick={() => handleOpenCategoryModal({ name: c.name, slug: c.slug, description: 'Added from unregistered folder.' })}
+                            onClick={() => handleOpenCategoryModal({ id: c.id, name: c.name, slug: c.slug, description: 'Added from unregistered folder.' })}
                             className="mt-2 w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
                           >
                             Register as Category

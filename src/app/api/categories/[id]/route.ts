@@ -68,6 +68,10 @@ export async function PUT(
     const { id: categoryId } = await params;
     const body = await req.json();
     
+    if (categoryId === 'undefined' || !categoryId) {
+      return NextResponse.json({ message: 'Invalid category ID' }, { status: 400 });
+    }
+
     // Check if the PUT is specifically a request to just create/ensure the directory exists
     const ensureFolderOnly = body.action === 'create-folder';
 
