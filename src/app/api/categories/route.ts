@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
 
     if (needsHeal) {
       // Save the healed database immediately
-      const dataPath = (config.dataPaths as any)['categories'];
+      const dataPath = path.resolve(process.cwd(), 'public/uploads/data/categories.json');
       await fs.promises.writeFile(dataPath, JSON.stringify(categories, null, 2));
     }
 
