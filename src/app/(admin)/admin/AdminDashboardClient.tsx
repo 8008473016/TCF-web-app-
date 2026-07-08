@@ -254,19 +254,6 @@ export const AdminDashboardClient: React.FC = () => {
     setIsCategoryModalOpen(true);
   };
 
-  const handleRegisterFolder = async (slug: string) => {
-    if (!window.confirm(`Register physical folder '${slug}' as a new category?`)) return;
-    try {
-      console.log(`[FRONTEND DEBUG] Registering folder: ${slug}`);
-      await api.post('/categories/register-folder', { slug });
-      alert('Folder registered as category successfully!');
-      fetchCategories(true);
-    } catch (error: any) {
-      console.error('[FRONTEND DEBUG] Folder Registration Error:', error);
-      alert(`Failed to register folder: ${error.response?.data?.error || error.response?.data?.message || error.message}`);
-    }
-  };
-
   const handleCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!categoryForm.name.trim() || !categoryForm.slug.trim()) return;
@@ -298,40 +285,13 @@ export const AdminDashboardClient: React.FC = () => {
   const handleDeleteCategory = async (id: number) => {
     if (!window.confirm('Delete this category?')) return;
     const deleteProducts = window.confirm('Do you also want to delete all products linked to this category? (DB records only)');
-    const deleteFolder = window.confirm('Do you also want to delete the physical folder and all of its images on the server? (Warning: Irreversible data loss)');
     try {
-      await api.delete(`/categories/${id}?deleteFolder=${deleteFolder}&deleteProducts=${deleteProducts}`);
+      await api.delete(`/categories/${id}?deleteProducts=${deleteProducts}`);
       fetchCategories(true);
       fetchAllAdminData();
       alert('Category deleted successfully.');
     } catch {
       alert('Failed to delete category.');
-    }
-  };
-
-  const handleDeleteUnregisteredFolder = async (slug: string, folderName?: string) => {
-    const targetName = folderName || slug;
-    if (!window.confirm(`Delete folder "${targetName}"?`)) return;
-    try {
-      await api.delete(`/admin/categories/folder?slug=${encodeURIComponent(slug)}`, {
-        data: { folderName: targetName }
-      });
-      // Refresh the store from the backend
-      fetchCategories(true);
-    } catch (error: any) {
-      console.error('Failed to delete folder', error);
-      const errorMessage = error.response?.data?.message || error.response?.data?.error || error.message || 'Unknown error occurred';
-      alert(`Failed to delete folder: ${errorMessage}`);
-    }
-  };
-
-  const handleCreateCategoryFolder = async (c: any) => {
-    try {
-      await api.put(`/categories/${c.databaseId}`, c);
-      fetchCategories(true);
-      alert('Physical folder created successfully!');
-    } catch {
-      alert('Failed to create category folder.');
     }
   };
 
@@ -2048,45 +2008,9 @@ export const AdminDashboardClient: React.FC = () => {
                         )}
                         <div className="flex justify-between items-start">
                           <span className="text-[10px] font-bold text-gray-500 uppercase">Slug: {c.slug}</span>
-                          {!c.registered ? (
-                            <span className="bg-amber-100 text-amber-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Unregistered Folder</span>
-                          ) : !c.folderExists ? (
-                            <span className="bg-red-100 text-red-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Folder Missing</span>
-                          ) : (
-                            <span className="bg-green-100 text-green-800 text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">Folder OK</span>
-                          )}
                         </div>
                         <h4 className="font-serif font-bold text-sm text-[#121110]">{c.name}</h4>
                         <p className="text-[11px] text-gray-500 leading-relaxed truncate">{c.description}</p>
-                        
-                        {/* Folder Status Actions */}
-                        {!c.registered ? (
-                          <div className="mt-2 flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => handleRegisterFolder(c.slug)}
-                              className="w-full py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
-                            >
-                              Register as Category
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDeleteUnregisteredFolder(c.slug, c.folderName)}
-                              className="px-2.5 py-1.5 bg-red-100 hover:bg-red-200 text-red-600 border border-red-200 rounded flex items-center justify-center cursor-pointer"
-                              title="Delete Folder"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        ) : !c.folderExists ? (
-                          <button
-                            type="button"
-                            onClick={() => handleCreateCategoryFolder(c)}
-                            className="mt-2 w-full py-1.5 bg-[#DE2943] hover:bg-red-750 text-white text-[10px] font-bold uppercase rounded text-center cursor-pointer"
-                          >
-                            Create Folder
-                          </button>
-                        ) : null}
                       </div>
                     ))}
                   </div>

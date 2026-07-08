@@ -22,70 +22,20 @@ export async function GET(req: NextRequest) {
     const url = new URL(req.url);
     const isAdminRequest = url.searchParams.get('admin') === 'true';
 
-    // Base formatted categories
-    const formatted: any[] = validCategories.map((c: any) => {
-      const slug = c.slug;
-      return {
-        databaseId: c.id ? parseInt(c.id, 10) : null,
-        slug: slug,
-        folderName: '', // Initialize empty string
-        name: c.name,
-        description: c.description || '',
-        image_url: c.image_url || '',
-        banner: c.banner || '',
-        status: c.status,
-        sort_order: c.sort_order,
-        folderPath: `/home/u372321620/uploads/products/${slug}`, // legacy placeholder
-        publicUrl: `/uploads/products/${slug}`, // legacy placeholder
-        createdAt: c.created_at,
-        updatedAt: c.updated_at,
-        folderExists: false, // will update if admin
-        registered: true,
-        statusLabel: 'FOLDER MISSING' // will update if admin
-      };
-    });
-
-    // Only scan folders for admin sync
-    if (isAdminRequest) {
-      const physicalFolders = listProductFolders();
-
-      // Update folderExists and statusLabel for registered categories
-      formatted.forEach((c: any) => {
-        const matchedFolder = physicalFolders.find(f => f.slug === c.slug.toLowerCase());
-        c.folderExists = !!matchedFolder;
-        c.statusLabel = c.folderExists ? 'FOLDER OK' : 'FOLDER MISSING';
-        if (matchedFolder) {
-          c.folderPath = matchedFolder.absolutePath;
-          c.publicUrl = matchedFolder.urlPath;
-          c.folderName = matchedFolder.folderName;
-        }
-      });
-
-      // Add unregistered physical folders
-      physicalFolders.forEach(folder => {
-        const matches = formatted.some(c => c.slug.toLowerCase() === folder.slug);
-        if (!matches) {
-          formatted.push({
-            databaseId: null,
-            slug: folder.slug,
-            folderName: folder.folderName,
-            name: folder.folderName.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-            description: 'Physical folder with no category definition in database.',
-            image_url: '',
-            banner: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1200&q=80',
-            status: 'inactive',
-            sort_order: 0,
-            folderPath: folder.absolutePath,
-            publicUrl: folder.urlPath,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            folderExists: true,
-            registered: false,
-            statusLabel: 'UNREGISTERED FOLDER'
-          });
-        }
-      });
-    }
+    const formatted = validCategories.map((c: any) => ({
+      id: c.id ? parseInt(c.id, 10) : null,
+      databaseId: c.id ? parseInt(c.id, 10) : null, // keep this just in case frontend relies on it
+      slug: c.slug,
+      name: c.name,
+      description: c.description || '',
+      image_url: c.image_url || '',
+      banner: c.banner || '',
+      status: c.status,
+      sort_order: c.sort_order,
+      createdAt: c.created_at,
+      updatedAt: c.updated_at,
+      registered: true
+    }));
 
     return NextResponse.json(formatted);
   } catch (error: any) {

@@ -37,7 +37,7 @@ export async function DELETE(
     }
 
     const url = new URL(req.url);
-    const deleteFolder = url.searchParams.get('deleteFolder') === 'true';
+
     const deleteProducts = url.searchParams.get('deleteProducts') === 'true';
 
     // Get the category details to know the slug before deleting
@@ -66,14 +66,6 @@ export async function DELETE(
         }
       }
 
-      if (deleteFolder && category) {
-        const slug = category.slug;
-        const uploadRoot = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";
-        const targetDir = path.resolve(uploadRoot, 'products', slug);
-        if (fs.existsSync(targetDir)) {
-          fs.rmSync(targetDir, { recursive: true, force: true });
-        }
-      }
       return NextResponse.json({ message: 'Category deleted successfully' });
     } else {
       return NextResponse.json({ message: 'Category not found' }, { status: 404 });
