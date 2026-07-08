@@ -84,6 +84,7 @@ export const AdminDashboardClient: React.FC = () => {
 
   // --- Product Manager (Shopify-style Form States) ---
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [activeProductTab, setActiveProductTab] = useState<ProductTab>('general');
   const [productForm, setProductForm] = useState({
@@ -154,7 +155,28 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
-  // --- Actions ---
+  const handleBulkDeleteProducts = async () => {
+    if (selectedProducts.length === 0) return;
+    if (!window.confirm(`Are you sure you want to delete ${selectedProducts.length} selected products?`)) return;
+    
+    // As per requirements, do not delete image files by default
+    const deleteFiles = false;
+
+    try {
+      const response = await api.post('/products/bulk-delete', {
+        ids: selectedProducts,
+        deleteFiles
+      });
+      alert(`Successfully deleted ${response.data.deletedCount} products.`);
+      setSelectedProducts([]);
+      fetchAllAdminData();
+    } catch (error: any) {
+      console.error('[FRONTEND ERROR] Bulk delete failed:', error);
+      alert(`Failed to bulk delete products: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // --- MEDIA HANDLERS ---
 
   // Product Duplication
   const handleDuplicateProduct = async (product: any) => {
@@ -274,11 +296,13 @@ export const AdminDashboardClient: React.FC = () => {
   };
 
   const handleDeleteCategory = async (id: number) => {
-    if (!window.confirm('Delete this category? This might affect existing products.')) return;
-    const deleteFolder = window.confirm('Do you also want to delete the physical folder and all of its images on the server? (Warning: This action is irreversible)');
+    if (!window.confirm('Delete this category?')) return;
+    const deleteProducts = window.confirm('Do you also want to delete all products linked to this category? (DB records only)');
+    const deleteFolder = window.confirm('Do you also want to delete the physical folder and all of its images on the server? (Warning: Irreversible data loss)');
     try {
-      await api.delete(`/categories/${id}?deleteFolder=${deleteFolder}`);
+      await api.delete(`/categories/${id}?deleteFolder=${deleteFolder}&deleteProducts=${deleteProducts}`);
       fetchCategories(true);
+      fetchAllAdminData();
       alert('Category deleted successfully.');
     } catch {
       alert('Failed to delete category.');
@@ -295,6 +319,22 @@ export const AdminDashboardClient: React.FC = () => {
     }
   };
 
+  const handleImportFromFolders = async () => {
+    if (!window.confirm('Are you sure you want to run the first-time folder import? This will scan public/uploads/products and automatically create categories and products.')) return;
+    try {
+      alert('Importing products... Please wait, this might take a moment.');
+      const response = await api.post('/admin/import-products-from-folders');
+      const res = response.data.results;
+      alert(`Import complete!\nCategories Created: ${res.categoriesCreated}\nCategories Existing: ${res.categoriesExisting}\nProducts Created: ${res.productsCreated}\nProducts Skipped (already exist): ${res.productsSkipped}\nImages Registered: ${res.imagesCreated}`);
+      fetchCategories(true);
+      fetchAllAdminData();
+    } catch (error: any) {
+      console.error('[FRONTEND ERROR] Folder import failed:', error);
+      alert(`Failed to import from folders: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // --- UI HANDLERS ---
   const [uploadingProductImage, setUploadingProductImage] = useState(false);
 
   const handleProductImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number | 'append') => {
@@ -1660,13 +1700,22 @@ export const AdminDashboardClient: React.FC = () => {
                           <h2 className="text-xl font-serif font-bold text-[#121110]">Showroom Categories</h2>
                           <p className="text-xs text-gray-500 font-mono">Add, edit details, upload banners, or delete categories used in the showroom catalogue.</p>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenCategoryModal()}
-                          className="px-3.5 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
-                        >
-                          <Plus className="w-4 h-4" /> Add Category
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => handleImportFromFolders()}
+                            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                          >
+                            <Download className="w-4 h-4" /> Import From Folders
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCategoryModal()}
+                            className="px-3.5 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                          >
+                            <Plus className="w-4 h-4" /> Add Category
+                          </button>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                         {categories.map((c) => (
@@ -1764,12 +1813,22 @@ export const AdminDashboardClient: React.FC = () => {
                       <h2 className="text-2xl font-serif font-bold text-[#121110]">Products Catalog</h2>
                       <p className="text-xs text-gray-500">Shopify-style management dashboard for all products.</p>
                     </div>
-                    <button
-                      onClick={() => handleOpenProductModal()}
-                      className="px-4 py-2.5 bg-[#DE2943] text-white hover:bg-red-750 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm rounded-lg cursor-pointer transition-colors"
-                    >
-                      <Plus className="w-4 h-4" /> Add Product
-                    </button>
+                    <div className="flex items-center gap-3">
+                      {selectedProducts.length > 0 && (
+                        <button
+                          onClick={handleBulkDeleteProducts}
+                          className="px-4 py-2.5 bg-gray-100 text-red-600 hover:bg-red-50 hover:border-red-200 border border-transparent font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm rounded-lg cursor-pointer transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" /> Bulk Delete ({selectedProducts.length})
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleOpenProductModal()}
+                        className="px-4 py-2.5 bg-[#DE2943] text-white hover:bg-red-750 font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-sm rounded-lg cursor-pointer transition-colors"
+                      >
+                        <Plus className="w-4 h-4" /> Add Product
+                      </button>
+                    </div>
                   </div>
 
                   {/* Filters bar */}
@@ -1814,6 +1873,20 @@ export const AdminDashboardClient: React.FC = () => {
                     <table className="w-full text-left text-xs border-collapse">
                       <thead>
                         <tr className="bg-[#F5F2EB] text-[#121110] border-b border-gray-200 font-bold">
+                          <th className="p-3 w-10">
+                            <input 
+                              type="checkbox" 
+                              checked={filteredProductsList.length > 0 && selectedProducts.length === filteredProductsList.length}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setSelectedProducts(filteredProductsList.map(p => p.id));
+                                } else {
+                                  setSelectedProducts([]);
+                                }
+                              }}
+                              className="rounded border-gray-300 text-[#DE2943] focus:ring-[#DE2943]"
+                            />
+                          </th>
                           <th className="p-3">SKU</th>
                           <th className="p-3">Product Name</th>
                           <th className="p-3">Category</th>
@@ -1827,6 +1900,20 @@ export const AdminDashboardClient: React.FC = () => {
                         {filteredProductsList.length > 0 ? (
                           filteredProductsList.map((p, i) => (
                             <tr key={i} className="border-b border-gray-100 last:border-0 hover:bg-gray-50/50">
+                              <td className="p-3">
+                                <input 
+                                  type="checkbox" 
+                                  checked={selectedProducts.includes(p.id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setSelectedProducts(prev => [...prev, p.id]);
+                                    } else {
+                                      setSelectedProducts(prev => prev.filter(id => id !== p.id));
+                                    }
+                                  }}
+                                  className="rounded border-gray-300 text-[#DE2943] focus:ring-[#DE2943]"
+                                />
+                              </td>
                               <td className="p-3 font-mono font-semibold">{p.sku}</td>
                               <td className="p-3">
                                 <span className="font-bold text-[#121110] block">{p.name}</span>

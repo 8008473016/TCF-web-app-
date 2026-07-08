@@ -38,6 +38,7 @@ export async function DELETE(
 
     const url = new URL(req.url);
     const deleteFolder = url.searchParams.get('deleteFolder') === 'true';
+    const deleteProducts = url.searchParams.get('deleteProducts') === 'true';
 
     // Get the category details to know the slug before deleting
     const categories = await db.read('categories');
@@ -45,6 +46,26 @@ export async function DELETE(
 
     const success = await db.delete('categories', 'id', String(categoryId));
     if (success) {
+      if (deleteProducts && category) {
+        try {
+          const { getMySqlPool } = await import('@/lib/mysql');
+          const mysqlDb = getMySqlPool();
+          
+          const [productsToDelete]: any = await mysqlDb.query(`SELECT id FROM products WHERE category = ?`, [category.slug]);
+          
+          if (productsToDelete.length > 0) {
+            const productIds = productsToDelete.map((p: any) => p.id);
+            const placeholders = productIds.map(() => '?').join(',');
+            
+            await mysqlDb.query(`DELETE FROM product_images WHERE product_id IN (${placeholders})`, productIds);
+            await mysqlDb.query(`DELETE FROM products WHERE category = ?`, [category.slug]);
+            console.log(`[API DEBUG] Deleted ${productsToDelete.length} products for category ${category.slug}`);
+          }
+        } catch (e: any) {
+          console.error(`[API ERROR] Failed to delete linked products:`, e.message);
+        }
+      }
+
       if (deleteFolder && category) {
         const slug = category.slug;
         const uploadRoot = process.env.UPLOADS_BASE_DIR || "/home/u372321620/uploads";

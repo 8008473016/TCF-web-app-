@@ -141,6 +141,17 @@ export async function initDatabase() {
       )
     `);
 
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS product_images (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        product_id VARCHAR(100),
+        image_url TEXT,
+        alt_text VARCHAR(255),
+        sort_order INT DEFAULT 0,
+        is_primary BOOLEAN DEFAULT FALSE
+      )
+    `);
+
     // Create indexes for performance
     try {
       await db.query(`CREATE INDEX idx_products_slug ON products (slug)`);
@@ -156,6 +167,9 @@ export async function initDatabase() {
     } catch (e) { /* ignore if exists */ }
     try {
       await db.query(`CREATE INDEX idx_analytics_created ON analytics (created_at)`);
+    } catch (e) { /* ignore if exists */ }
+    try {
+      await db.query(`CREATE UNIQUE INDEX idx_product_images_unique ON product_images (product_id, image_url(255))`);
     } catch (e) { /* ignore if exists */ }
 
     console.log('MySQL schema initialization successful.');
