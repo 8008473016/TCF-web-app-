@@ -28,10 +28,7 @@ export async function POST(req: NextRequest) {
     const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
     
     // Robust path building
-    let uploadRoot = path.join(process.cwd(), "public", "uploads");
-    if (process.env.NODE_ENV === 'production' || process.env.FORCE_EXTERNAL_UPLOADS === 'true') {
-      uploadRoot = '/home/u372321620/uploads';
-    }
+    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.join(process.cwd(), "public", "uploads");
     
     const productsRoot = path.join(uploadRoot, "products");
     const targetDir = path.join(productsRoot, catSub);

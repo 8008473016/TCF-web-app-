@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
 import "../globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -8,17 +7,6 @@ import { FloatingCTA } from "@/components/layout/FloatingCTA";
 import { QuoteRequestDialog } from "@/components/layout/QuoteRequestDialog";
 
 export const dynamic = 'force-dynamic';
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-const playfair = Playfair_Display({
-  variable: "--font-playfair",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "TCF - Tenali Central Furniture | Premium Wooden Furniture Store",
@@ -41,7 +29,7 @@ export default function PublicLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+      className="h-full antialiased"
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-tcf-light text-tcf-dark selection:bg-tcf-red selection:text-white pb-16 md:pb-0">

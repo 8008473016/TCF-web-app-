@@ -41,7 +41,8 @@ export async function DELETE(
     if (success) {
       if (deleteFolder && category) {
         const slug = category.slug || category['Slug'];
-        const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
+        const uploadRoot = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
+        const targetDir = path.resolve(uploadRoot, 'products', slug);
         if (fs.existsSync(targetDir)) {
           fs.rmSync(targetDir, { recursive: true, force: true });
         }
@@ -78,9 +79,17 @@ export async function PUT(
     const slug = makeSafeSlug(body.slug || body.name || categoryId);
     
     // Automatically create category folder inside public/uploads
-    const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
+    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const targetDir = path.resolve(uploadRoot, 'products', slug);
     if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
+      try {
+        fs.mkdirSync(targetDir, { recursive: true });
+      } catch (err: any) {
+        return NextResponse.json({ 
+          message: 'Failed to create physical folder due to permission error', 
+          error: err.message 
+        }, { status: 500 });
+      }
     }
 
     if (ensureFolderOnly) {

@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     const categories = await db.read('categories');
     
     // Scan uploads directory for products folders
-    const uploadsDir = path.resolve(process.cwd(), 'public/uploads');
+    const uploadsDir = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
     const productsDir = path.resolve(uploadsDir, 'products');
     let physicalFolders: string[] = [];
     
@@ -114,9 +114,17 @@ export async function POST(req: NextRequest) {
     const now = new Date().toISOString();
     
     // Automatically create category folder inside public/uploads
-    const targetDir = path.resolve(process.cwd(), 'public/uploads', 'products', slug);
+    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.resolve(process.cwd(), 'public/uploads');
+    const targetDir = path.resolve(uploadRoot, 'products', slug);
     if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
+      try {
+        fs.mkdirSync(targetDir, { recursive: true });
+      } catch (err: any) {
+        return NextResponse.json({ 
+          message: 'Failed to create physical folder due to permission error', 
+          error: err.message 
+        }, { status: 500 });
+      }
     }
 
     const folderPath = `public/uploads/products/${slug}`;

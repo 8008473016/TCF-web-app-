@@ -13,8 +13,18 @@ export default async function ProductsPage() {
   const products = await db.read('products');
   const categories = await db.read('categories');
 
-  // Format products to match interface expected by client component
-  const formattedProducts = products.map((p: any) => ({
+  // Format categories
+  const formattedCategories = categories.map((c: any) => ({
+    id: String(c.id || c['Category ID'] || ''),
+    name: String(c.name || c['Category Name'] || ''),
+    slug: String(c.slug || c['Slug'] || ''),
+    description: String(c.description || c['Description'] || '')
+  }));
+
+  // Initial SSR fetch for first 24 items
+  const activeProducts = products.filter(p => String(p.Archived || p.archived).toLowerCase() !== 'true');
+  
+  const formattedProducts = activeProducts.slice(0, 24).map((p: any) => ({
     id: String(p.id || p['Product ID'] || ''),
     sku: String(p.sku || p['SKU'] || ''),
     name: String(p.name || p['Product Name'] || ''),
@@ -35,17 +45,22 @@ export default async function ProductsPage() {
     stock: Number(p.stock !== undefined ? p.stock : p['Stock'] !== undefined ? p['Stock'] : 1)
   }));
 
-  // Format categories
-  const formattedCategories = categories.map((c: any) => ({
-    id: String(c.id || c['Category ID'] || ''),
-    name: String(c.name || c['Category Name'] || ''),
-    slug: String(c.slug || c['Slug'] || ''),
-    description: String(c.description || c['Description'] || '')
-  }));
+  const materialsSet = new Set<string>();
+  let absoluteMaxPrice = 0;
+  activeProducts.forEach((p: any) => {
+    if (p.Material || p.material) materialsSet.add(p.Material || p.material);
+    const activePrice = Number(p['Sale Price'] || p.salePrice || p['Price'] || p.price || 0);
+    if (activePrice > absoluteMaxPrice) absoluteMaxPrice = activePrice;
+  });
+  
+  absoluteMaxPrice = absoluteMaxPrice > 150000 ? Math.ceil(absoluteMaxPrice / 50000) * 50000 : 150000;
 
   return (
     <ProductListingClient 
-      initialProducts={formattedProducts} 
+      initialProducts={formattedProducts}
+      initialTotal={activeProducts.length}
+      initialMaterials={Array.from(materialsSet)}
+      initialMaxPrice={absoluteMaxPrice}
       categories={formattedCategories} 
     />
   );

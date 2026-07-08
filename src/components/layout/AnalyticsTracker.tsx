@@ -11,6 +11,12 @@ const AnalyticsTrackerContent: React.FC = () => {
   useEffect(() => {
     const recordVisit = async () => {
       try {
+        // Prevent bots/crawlers from spamming analytics APIs
+        if (typeof window !== 'undefined' && navigator.userAgent) {
+          const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(navigator.userAgent);
+          if (isBot) return;
+        }
+
         const query = searchParams.toString();
         const fullPath = query ? `${pathname}?${query}` : pathname;
         await axios.post('/api/analytics/visit', { path: fullPath });

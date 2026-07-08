@@ -29,58 +29,51 @@ interface Category {
 
 interface ProductListingClientProps {
   initialProducts: Product[];
+  initialTotal: number;
+  initialMaterials: string[];
+  initialMaxPrice: number;
   categories: Category[];
 }
 
-const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialProducts, categories }) => {
+const ProductListingContent: React.FC<ProductListingClientProps> = ({ 
+  initialProducts, 
+  initialTotal, 
+  initialMaterials, 
+  initialMaxPrice, 
+  categories 
+}) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // Read URL params
   const categoryParam = searchParams.get('category') || 'all';
   const searchParam = searchParams.get('search') || '';
+  const pageParam = Number(searchParams.get('page')) || 1;
 
   const [selectedCategory, setSelectedCategory] = useState<string>(categoryParam);
   const [selectedMaterial, setSelectedMaterial] = useState<string>('all');
-  // Derive max price from products
-  const maxAvailablePrice = useMemo(() => {
-    if (!initialProducts || initialProducts.length === 0) return 150000;
-    const max = Math.max(...initialProducts.map((p) => p.salePrice || p.price || 0));
-    return max > 150000 ? Math.ceil(max / 50000) * 50000 : 150000;
-  }, [initialProducts]);
-
-  const [maxPrice, setMaxPrice] = useState<number>(maxAvailablePrice);
+  const [maxPrice, setMaxPrice] = useState<number>(initialMaxPrice);
   const [sortBy, setSortBy] = useState<string>('popular');
   const [showFilters, setShowFilters] = useState<boolean>(false);
+
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [total, setTotal] = useState<number>(initialTotal);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [totalPages, setTotalPages] = useState<number>(Math.ceil(initialTotal / 24));
 
   // Sync state with URL params
   useEffect(() => {
     setSelectedCategory(categoryParam);
   }, [categoryParam]);
 
-  // Sync maxPrice when products change
-  useEffect(() => {
-    setMaxPrice(maxAvailablePrice);
-  }, [maxAvailablePrice]);
-
-  // Derive unique materials list
-  const materials = useMemo(() => {
-    const list = new Set<string>();
-    initialProducts.forEach((p) => {
-      if (p.material) list.add(p.material);
-    });
-    return Array.from(list);
-  }, [initialProducts]);
-
   // Helper to build URL search queries
-  const createQueryString = (params: Record<string, string | null>) => {
+  const createQueryString = (params: Record<string, string | number | null>) => {
     const current = new URLSearchParams(Array.from(searchParams.entries()));
     Object.entries(params).forEach(([key, value]) => {
       if (value === null || value === 'all' || value === '') {
         current.delete(key);
       } else {
-        current.set(key, value);
+        current.set(key, String(value));
       }
     });
     return current.toString();
@@ -88,62 +81,53 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
 
   const handleCategorySelect = (catSlug: string) => {
     setSelectedCategory(catSlug);
-    const query = createQueryString({ category: catSlug });
-    router.push(query ? `${pathname}?${query}` : pathname);
+    const query = createQueryString({ category: catSlug, page: 1 });
+    router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
   // Reset Filters
   const handleResetFilters = () => {
     setSelectedCategory('all');
     setSelectedMaterial('all');
-    setMaxPrice(maxAvailablePrice);
+    setMaxPrice(initialMaxPrice);
     setSortBy('popular');
-    router.push(pathname);
+    router.push(pathname, { scroll: false });
   };
 
-  // Filter and Sort logic
-  const filteredProducts = useMemo(() => {
-    let list = [...initialProducts];
+  // Fetch paginated data from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const query = new URLSearchParams({
+          q: searchParam,
+          category: selectedCategory,
+          material: selectedMaterial,
+          maxPrice: String(maxPrice),
+          sortBy: sortBy,
+          page: String(pageParam),
+          limit: '24'
+        });
+        const res = await fetch(`/api/products/search?${query.toString()}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProducts(data.products);
+          setTotal(data.total);
+          setTotalPages(data.totalPages);
+        }
+      } catch (e) {
+        console.error('Failed to fetch products', e);
+      }
+      setLoading(false);
+    };
 
-    // Search query filter
-    if (searchParam) {
-      const q = searchParam.toLowerCase();
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.sku.toLowerCase().includes(q) ||
-          p.material.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q)
-      );
-    }
+    // Debounce the API call
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 300);
 
-    // Category filter
-    if (selectedCategory !== 'all') {
-      list = list.filter((p) => p.category === selectedCategory);
-    }
-
-    // Material filter
-    if (selectedMaterial !== 'all') {
-      list = list.filter((p) => p.material.toLowerCase() === selectedMaterial.toLowerCase());
-    }
-
-    // Price filter
-    list = list.filter((p) => {
-      const activePrice = p.salePrice || p.price;
-      return activePrice <= maxPrice;
-    });
-
-    // Sorting
-    if (sortBy === 'price-low') {
-      list.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
-    } else if (sortBy === 'price-high') {
-      list.sort((a, b) => (b.salePrice || b.price) - (a.salePrice || a.price));
-    } else if (sortBy === 'name-az') {
-      list.sort((a, b) => a.name.localeCompare(b.name));
-    }
-
-    return list;
-  }, [initialProducts, selectedCategory, selectedMaterial, maxPrice, sortBy, searchParam]);
+    return () => clearTimeout(timer);
+  }, [searchParam, selectedCategory, selectedMaterial, maxPrice, sortBy, pageParam]);
 
   const activeCategoryDetail = categories.find((c) => c.slug === selectedCategory);
 
@@ -159,7 +143,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
           </h1>
           <p className="text-sm text-tcf-dark/70 leading-relaxed font-light">
             {searchParam
-              ? `Showing ${filteredProducts.length} items matching your query.`
+              ? `Showing ${total} items matching your query.`
               : activeCategoryDetail?.description || 'Explore our full range of masterfully handcrafted solid wood furniture.'}
           </p>
         </div>
@@ -222,7 +206,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
                 >
                   All Materials
                 </button>
-                {materials.map((mat) => (
+                {initialMaterials.map((mat) => (
                   <button
                     key={mat}
                     onClick={() => setSelectedMaterial(mat)}
@@ -249,7 +233,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
               <input
                 type="range"
                 min="5000"
-                max={maxAvailablePrice}
+                max={initialMaxPrice}
                 step="5000"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(Number(e.target.value))}
@@ -257,7 +241,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
               />
               <div className="flex justify-between text-[10px] text-tcf-dark/40 font-mono">
                 <span>₹5,000</span>
-                <span>₹{maxAvailablePrice.toLocaleString('en-IN')}</span>
+                <span>₹{initialMaxPrice.toLocaleString('en-IN')}</span>
               </div>
             </div>
 
@@ -278,7 +262,7 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
           <div className="bg-white border border-tcf-sand px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-premium rounded-xl">
             <div className="flex items-center gap-2 text-sm text-tcf-dark/70">
               <Grid3X3 className="w-4 h-4 text-tcf-red" />
-              Showing <span className="font-semibold text-tcf-dark">{filteredProducts.length}</span> masterpieces
+              Showing <span className="font-semibold text-tcf-dark">{total}</span> masterpieces
             </div>
 
             {/* Sort selector */}
@@ -298,7 +282,11 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
           </div>
 
           {/* Catalog grid cards */}
-          {filteredProducts.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <RefreshCw className="w-8 h-8 text-tcf-red animate-spin" />
+            </div>
+          ) : products.length === 0 ? (
             <div className="bg-white border border-tcf-sand p-16 text-center shadow-premium space-y-4 rounded-2xl">
               <Grid3X3 className="w-12 h-12 text-tcf-sand mx-auto" />
               <h2 className="text-xl font-serif text-tcf-dark">No matching products found</h2>
@@ -313,11 +301,42 @@ const ProductListingContent: React.FC<ProductListingClientProps> = ({ initialPro
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+              
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-4 pt-10">
+                  <button
+                    disabled={pageParam <= 1}
+                    onClick={() => {
+                      const query = createQueryString({ page: pageParam - 1 });
+                      router.push(query ? `${pathname}?${query}` : pathname, { scroll: true });
+                    }}
+                    className="px-4 py-2 border border-tcf-sand disabled:opacity-50 hover:bg-tcf-red hover:text-white transition-colors rounded-lg font-semibold cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <span className="font-mono text-sm text-tcf-dark/70">
+                    Page {pageParam} of {totalPages}
+                  </span>
+                  <button
+                    disabled={pageParam >= totalPages}
+                    onClick={() => {
+                      const query = createQueryString({ page: pageParam + 1 });
+                      router.push(query ? `${pathname}?${query}` : pathname, { scroll: true });
+                    }}
+                    className="px-4 py-2 border border-tcf-sand disabled:opacity-50 hover:bg-tcf-red hover:text-white transition-colors rounded-lg font-semibold cursor-pointer"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
 

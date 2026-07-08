@@ -11,8 +11,10 @@ export function getMySqlPool() {
       password: process.env.MYSQL_PASSWORD,
       database: process.env.MYSQL_DATABASE,
       waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0,
+      connectionLimit: 5,
+      queueLimit: 50,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
     });
   }
   return pool;
@@ -135,6 +137,23 @@ export async function initDatabase() {
         created_at VARCHAR(100)
       )
     `);
+
+    // Create indexes for performance
+    try {
+      await db.query(`CREATE INDEX idx_products_slug ON products (slug)`);
+    } catch (e) { /* ignore if exists */ }
+    try {
+      await db.query(`CREATE INDEX idx_products_category ON products (category)`);
+    } catch (e) { /* ignore if exists */ }
+    try {
+      await db.query(`CREATE INDEX idx_products_featured ON products (featured)`);
+    } catch (e) { /* ignore if exists */ }
+    try {
+      await db.query(`CREATE INDEX idx_categories_slug ON categories (slug)`);
+    } catch (e) { /* ignore if exists */ }
+    try {
+      await db.query(`CREATE INDEX idx_analytics_created ON analytics (created_at)`);
+    } catch (e) { /* ignore if exists */ }
 
     console.log('MySQL schema initialization successful.');
   } catch (error) {

@@ -67,6 +67,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           sizes="(max-w-7xl) 25vw, (max-w-md) 50vw, 100vw"
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-700 ease-out"
           priority={false}
+          loading="lazy"
           onError={() => setImgSrc('/logo.jpg')}
         />
         

@@ -5,6 +5,15 @@ const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');
 
+process.on('uncaughtException', (err) => {
+  console.error('[CRITICAL] Uncaught Exception:', err);
+  // Do not exit, keep the process alive in shared hosting
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
 // Parse port as integer. If Hostinger passes a Unix socket path (string), this falls back to 3000
