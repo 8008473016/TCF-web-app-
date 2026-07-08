@@ -58,8 +58,18 @@ async function readLocalFile(filePath: string): Promise<any[]> {
     if (err.code === 'ENOENT') {
       const dir = path.dirname(filePath);
       await fs.mkdir(dir, { recursive: true });
-      await fs.writeFile(filePath, JSON.stringify([]));
-      return [];
+      
+      // MIGRATION LOGIC: If missing in public/uploads/data, copy from src/data
+      const filename = path.basename(filePath);
+      const seedFilePath = path.resolve(process.cwd(), 'src/data', filename);
+      try {
+        const seedData = await fs.readFile(seedFilePath, 'utf-8');
+        await fs.writeFile(filePath, seedData);
+        return JSON.parse(seedData);
+      } catch (seedErr) {
+        await fs.writeFile(filePath, JSON.stringify([]));
+        return [];
+      }
     }
     throw err;
   }

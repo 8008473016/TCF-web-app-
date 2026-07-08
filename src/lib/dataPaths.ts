@@ -1,13 +1,13 @@
 import path from 'path';
 
 export const dataPaths = {
-  products: path.resolve(process.cwd(), 'src/data/products.json'),
-  categories: path.resolve(process.cwd(), 'src/data/categories.json'),
-  orders: path.resolve(process.cwd(), 'src/data/orders.json'),
-  leads: path.resolve(process.cwd(), 'src/data/leads.json'),
-  blogs: path.resolve(process.cwd(), 'src/data/blogs.json'),
-  settings: path.resolve(process.cwd(), 'src/data/settings.json'),
-  analytics: path.resolve(process.cwd(), 'src/data/analytics.json'),
-  media: path.resolve(process.cwd(), 'src/data/media.json'),
-  reviews: path.resolve(process.cwd(), 'src/data/reviews.json'),
+  products: path.resolve(process.cwd(), 'public/uploads/data/products.json'),
+  categories: path.resolve(process.cwd(), 'public/uploads/data/categories.json'),
+  orders: path.resolve(process.cwd(), 'public/uploads/data/orders.json'),
+  leads: path.resolve(process.cwd(), 'public/uploads/data/leads.json'),
+  blogs: path.resolve(process.cwd(), 'public/uploads/data/blogs.json'),
+  settings: path.resolve(process.cwd(), 'public/uploads/data/settings.json'),
+  analytics: path.resolve(process.cwd(), 'public/uploads/data/analytics.json'),
+  media: path.resolve(process.cwd(), 'public/uploads/data/media.json'),
+  reviews: path.resolve(process.cwd(), 'public/uploads/data/reviews.json'),
 };
