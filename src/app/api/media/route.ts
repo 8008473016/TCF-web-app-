@@ -5,6 +5,7 @@ import { config } from '@/lib/config';
 import fs from 'fs';
 import path from 'path';
 import { driveService } from '@/lib/drive';
+import { uploadFile } from '@/lib/upload-utils';
 
 const isAdmin = (req: NextRequest): boolean => {
   const token = req.headers.get('authorization') || req.headers.get('x-admin-token');
@@ -50,16 +51,10 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const targetDir = path.resolve(process.cwd(), 'public/uploads/products', catSub);
-    if (!fs.existsSync(targetDir)) {
-      fs.mkdirSync(targetDir, { recursive: true });
-    }
-
-    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-    const targetFilePath = path.join(targetDir, fileName);
-    await fs.promises.writeFile(targetFilePath, buffer);
-
-    const fileUrl = `/uploads/products/${catSub ? catSub + '/' : ''}${fileName}`;
+    const fileName = `${Date.now()}-${file.name.replace(/\\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const subDir = catSub ? `products/${catSub}` : 'products';
+    
+    const fileUrl = await uploadFile(buffer, subDir, fileName);
 
     const sizeStr = `${Math.round(file.size / 1024)} KB`;
     const newMedia = {

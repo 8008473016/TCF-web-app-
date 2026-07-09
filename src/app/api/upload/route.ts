@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { existsSync, mkdirSync } from 'fs';
 import { writeFile } from 'fs/promises';
 import path from 'path';
+import { uploadFile } from '@/lib/upload-utils';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,28 +26,10 @@ export async function POST(req: NextRequest) {
           .replace(/-+/g, '-')
       : 'uncategorized';
 
-    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const fileName = `${Date.now()}-${file.name.replace(/\\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const subDir = `products/${catSub}`;
     
-    // Robust path building
-    const uploadRoot = process.env.UPLOADS_BASE_DIR || path.join(process.cwd(), "public", "uploads");
-    
-    const productsRoot = path.join(uploadRoot, "products");
-    const targetDir = path.join(productsRoot, catSub);
-
-    if (!existsSync(uploadRoot)) {
-      mkdirSync(uploadRoot, { recursive: true });
-    }
-    if (!existsSync(productsRoot)) {
-      mkdirSync(productsRoot, { recursive: true });
-    }
-    if (!existsSync(targetDir)) {
-      mkdirSync(targetDir, { recursive: true });
-    }
-
-    const targetFilePath = path.join(targetDir, fileName);
-    await writeFile(targetFilePath, buffer);
-    
-    const fileUrl = `/uploads/products/${catSub}/${fileName}`;
+    const fileUrl = await uploadFile(buffer, subDir, fileName);
     return NextResponse.json({ success: true, url: fileUrl });
   } catch (error: any) {
     console.error('[API UPLOAD ROUTE ERROR]:', error);
