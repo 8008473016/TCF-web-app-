@@ -18,6 +18,10 @@ const escapeStr = (str) => {
 };
 
 let sql = `-- TCF Database Seed Export\n-- Generated from local JSON database\n\n`;
+let catCount = 0;
+let prodCount = 0;
+let imgCount = 0;
+let settingsCount = 0;
 
 // 1. Categories
 const categoriesFile = path.join(dataDir, 'categories.json');
@@ -38,15 +42,15 @@ if (fs.existsSync(categoriesFile)) {
       sql += `INSERT INTO categories (id, name, slug, description, image_url, banner, status, sort_order) ` +
              `VALUES (${id}, ${name}, ${slug}, ${desc}, ${image_url}, ${banner}, ${status}, ${sort_order}) ` +
              `ON DUPLICATE KEY UPDATE name=VALUES(name), description=VALUES(description), image_url=VALUES(image_url), banner=VALUES(banner), status=VALUES(status), sort_order=VALUES(sort_order);\n`;
+      catCount++;
     }
     sql += `\n`;
   }
 }
 
-// 2. Products
+// 2. Products and Product Images
 const productsFile = path.join(dataDir, 'products.json');
 let productImagesSql = `-- Product Images\n`;
-let imgIdCounter = 1;
 
 if (fs.existsSync(productsFile)) {
   const products = JSON.parse(fs.readFileSync(productsFile, 'utf8'));
@@ -61,7 +65,7 @@ if (fs.existsSync(productsFile)) {
       const desc = escapeStr(p.description || p['Description']);
       const price = p.price || p['Price'] || 0;
       const sale_price = escapeStr(p.salePrice || p['Sale Price']);
-      const stock = p.stock || p['Stock'] || 0;
+      const stock = p.stock !== undefined ? p.stock : (p['Stock'] !== undefined ? p['Stock'] : 0);
       const material = escapeStr(p.material || p['Material']);
       const dimensions = escapeStr(p.dimensions || p['Dimensions']);
       const weight = p.weight || p['Weight'] || 0;
@@ -80,8 +84,8 @@ if (fs.existsSync(productsFile)) {
       }
       const imagesJson = escapeStr(JSON.stringify(imagesArr));
 
-      const featured = escapeStr(p.featured || p['Featured'] === 'TRUE' ? true : false);
-      const archived = escapeStr(p.archived || p['Archived'] === 'true' ? true : false);
+      const featured = escapeStr(p.featured === true || p['Featured'] === 'TRUE' ? true : false);
+      const archived = escapeStr(p.archived === true || p['Archived'] === 'true' ? true : false);
       const seo_title = escapeStr(p.seoTitle || p['SEO Title']);
       const seo_desc = escapeStr(p.seoDescription || p['SEO Description']);
       const ai_generated = escapeStr(p.ai_generated ? true : false);
@@ -89,6 +93,7 @@ if (fs.existsSync(productsFile)) {
       sql += `INSERT INTO products (id, sku, name, slug, category, description, price, sale_price, stock, material, dimensions, weight, images, featured, archived, seo_title, seo_description, ai_generated) ` +
              `VALUES (${id}, ${sku}, ${name}, ${slug}, ${category}, ${desc}, ${price}, ${sale_price}, ${stock}, ${material}, ${dimensions}, ${weight}, ${imagesJson}, ${featured}, ${archived}, ${seo_title}, ${seo_desc}, ${ai_generated}) ` +
              `ON DUPLICATE KEY UPDATE sku=VALUES(sku), name=VALUES(name), category=VALUES(category), description=VALUES(description), price=VALUES(price), sale_price=VALUES(sale_price), stock=VALUES(stock), material=VALUES(material), dimensions=VALUES(dimensions), weight=VALUES(weight), images=VALUES(images), featured=VALUES(featured), archived=VALUES(archived), seo_title=VALUES(seo_title), seo_description=VALUES(seo_description), ai_generated=VALUES(ai_generated);\n`;
+      prodCount++;
 
       // Product Images
       for (let i = 0; i < imagesArr.length; i++) {
@@ -97,16 +102,43 @@ if (fs.existsSync(productsFile)) {
         productImagesSql += `INSERT INTO product_images (product_id, image_url, alt_text, sort_order, is_primary) ` +
                             `SELECT ${id}, ${imgUrl}, ${name}, ${i}, ${isPrimary} ` +
                             `WHERE NOT EXISTS (SELECT 1 FROM product_images WHERE product_id = ${id} AND image_url = ${imgUrl});\n`;
+        imgCount++;
       }
     }
     sql += `\n`;
   }
 }
 
-sql += productImagesSql;
+sql += productImagesSql + `\n`;
 
-// Ensure all paths match the Hostinger requirement of /uploads/Products/
-sql = sql.replace(/\/uploads\/products\//g, '/uploads/Products/');
+// 3. Settings
+const settingsFile = path.join(dataDir, 'settings.json');
+if (fs.existsSync(settingsFile)) {
+  const settings = JSON.parse(fs.readFileSync(settingsFile, 'utf8'));
+  if (settings.length > 0) {
+    sql += `-- Settings\n`;
+    for (const s of settings) {
+      const key = escapeStr(s.Key || s.key);
+      const val = escapeStr(s.Value || s.value);
+      
+      sql += `INSERT INTO settings (setting_key, setting_value) ` +
+             `VALUES (${key}, ${val}) ` +
+             `ON DUPLICATE KEY UPDATE setting_value=VALUES(setting_value);\n`;
+      settingsCount++;
+    }
+    sql += `\n`;
+  }
+}
+
+// 4. Ensure paths use /uploads/products/
+// Note: If some paths in JSON are /uploads/Products/, let's normalize to /uploads/products/
+// as requested: "Image URLs must stay relative: /uploads/products/category/image.png"
+sql = sql.replace(/\/uploads\/Products\//g, '/uploads/products/');
 
 fs.writeFileSync(outFile, sql, 'utf8');
-console.log(`Generated ${outFile}`);
+
+console.log(`✅ Successfully generated ${outFile}`);
+console.log(`- Categories exported: ${catCount}`);
+console.log(`- Products exported:   ${prodCount}`);
+console.log(`- Images exported:     ${imgCount}`);
+console.log(`- Settings exported:   ${settingsCount}`);
