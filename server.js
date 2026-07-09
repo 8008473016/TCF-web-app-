@@ -23,9 +23,8 @@ process.env.RAYON_NUM_THREADS = '1';
 process.env.UV_THREADPOOL_SIZE = '1';
 process.env.VIPS_CONCURRENCY = '1';
 
-// Parse port as integer. If Hostinger passes a Unix socket path (string), this falls back to 3000
-// Passenger will intercept this listen(3000) call anyway and map it to its own socket.
-const port = parseInt(process.env.PORT, 10) || 3000;
+// Do not parse port as integer. Hostinger LiteSpeed passes a Unix socket path (string), we MUST listen on it exactly as is.
+const port = process.env.PORT || 3000;
 
 const app = next({ dev, hostname, port });
 const handle = app.getRequestHandler();
