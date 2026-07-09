@@ -119,6 +119,8 @@ const mapToMysql: Record<string, Record<string, string>> = {
     'url': 'url',
     'category': 'category',
     'size': 'size',
+    'Alt': 'alt',
+    'alt': 'alt',
     'createdAt': 'created_at',
   },
   analytics: {
@@ -208,6 +210,7 @@ const mapFromMysql: Record<string, Record<string, string>> = {
     'url': 'url',
     'category': 'category',
     'size': 'size',
+    'alt': 'alt',
     'created_at': 'createdAt',
   },
   analytics: {

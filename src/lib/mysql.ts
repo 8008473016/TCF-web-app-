@@ -133,10 +133,14 @@ export async function initDatabase() {
         path TEXT,
         url TEXT,
         category VARCHAR(100),
-        size INT,
+        size VARCHAR(100),
+        alt TEXT,
         created_at VARCHAR(100)
       )
     `);
+
+    try { await db.query(`ALTER TABLE media MODIFY COLUMN size VARCHAR(100)`); } catch (e) {}
+    try { await db.query(`ALTER TABLE media ADD COLUMN alt TEXT`); } catch (e) {}
 
     await db.query(`
       CREATE TABLE IF NOT EXISTS analytics (
