@@ -20,7 +20,12 @@ export function getMySqlPool() {
   return pool;
 }
 
+let isInitialized = false;
+
 export async function initDatabase() {
+  if (isInitialized) return;
+  isInitialized = true;
+
   if (process.env.NODE_ENV !== 'production' && process.env.FORCE_MYSQL !== 'true') return;
   if (!process.env.MYSQL_DATABASE) {
     console.log('No MySQL database configured. Skipping MySQL init to prevent server hangs.');
@@ -175,7 +180,10 @@ export async function initDatabase() {
     } catch (e) { /* ignore if exists */ }
 
     console.log('MySQL schema initialization successful.');
-  } catch (error) {
-    console.error('Failed to initialize MySQL Database schema:', error);
+  } catch (err) {
+    console.error('MySQL initialization failed:', err);
   }
 }
+
+// Automatically trigger initialization exactly once when this module is first imported by Node.js.
+initDatabase().catch(console.error);

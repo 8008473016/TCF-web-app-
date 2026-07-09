@@ -1252,7 +1252,7 @@ export const AdminDashboardClient: React.FC = () => {
                         <span className="font-bold text-[#121110]">{mediaItems.length} Uploads</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-500">Google Sheets Sync</span>
+                        <span className="text-gray-500">Local JSON Storage</span>
                         <span className="font-bold text-gray-400 italic">Local Fallback</span>
                       </div>
                     </div>

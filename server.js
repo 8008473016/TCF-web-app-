@@ -16,10 +16,10 @@ process.on('unhandledRejection', (reason, promise) => {
 
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
-// Parse port as integer. If Hostinger passes a Unix socket path (string), this falls back to 3000
-const port = parseInt(process.env.PORT, 10) || 3000;
+// Fix: Do not use parseInt on port as Hostinger may pass a Unix socket path string
+const port = process.env.PORT || 3000;
 
-const app = next({ dev, hostname, port });
+const app = next({ dev, hostname });
 const handle = app.getRequestHandler();
 
 app.prepare()

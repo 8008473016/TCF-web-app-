@@ -1,16 +1,4 @@
-import { initDatabase, getMySqlPool } from './mysql';
-
-let initPromise: Promise<void> | null = null;
-async function ensureInit() {
-  if (!initPromise) {
-    initPromise = initDatabase().catch(err => {
-      // If it fails, allow it to be retried next time
-      initPromise = null;
-      console.error('ensureInit failed:', err);
-    });
-  }
-  await initPromise;
-}
+import { getMySqlPool } from './mysql';
 
 const mapToMysql: Record<string, Record<string, string>> = {
   products: {
@@ -291,59 +279,75 @@ function formatFromResult(tableName: string, row: any) {
 
 export const dbMysql = {
   read: async (tableName: string): Promise<any[]> => {
-    await ensureInit();
-    const db = getMySqlPool();
-    const [rows] = await db.query(`SELECT * FROM \`${tableName}\``) as any[];
-    return rows.map((row: any) => formatFromResult(tableName, row));
+    try {
+      const db = getMySqlPool();
+      const [rows] = await db.query(`SELECT * FROM \`${tableName}\``) as any[];
+      return rows.map((row: any) => formatFromResult(tableName, row));
+    } catch (error) {
+      console.error(`[MySQL Error] Failed to read ${tableName}:`, error);
+      return [];
+    }
   },
 
   insert: async (tableName: string, data: any): Promise<any> => {
-    await ensureInit();
-    const db = getMySqlPool();
-    const formatted = formatForInsert(tableName, data);
-    
-    const keys = Object.keys(formatted);
-    if (keys.length === 0) return data;
+    try {
+      const db = getMySqlPool();
+      const formatted = formatForInsert(tableName, data);
+      
+      const keys = Object.keys(formatted);
+      if (keys.length === 0) return data;
 
-    const placeholders = keys.map(() => '?').join(', ');
-    const values = keys.map(k => formatted[k]);
-    
-    const query = `INSERT INTO \`${tableName}\` (${keys.map(k => `\`${k}\``).join(', ')}) VALUES (${placeholders})`;
-    await db.execute(query, values);
-    
-    return data;
+      const placeholders = keys.map(() => '?').join(', ');
+      const values = keys.map(k => formatted[k]);
+      
+      const query = `INSERT INTO \`${tableName}\` (${keys.map(k => `\`${k}\``).join(', ')}) VALUES (${placeholders})`;
+      await db.execute(query, values);
+      
+      return data;
+    } catch (error) {
+      console.error(`[MySQL Error] Failed to insert into ${tableName}:`, error);
+      return null;
+    }
   },
 
   update: async (tableName: string, keyField: string, keyValue: string, updateData: any): Promise<any> => {
-    await ensureInit();
-    const db = getMySqlPool();
-    const formatted = formatForInsert(tableName, updateData);
-    
-    // Find the primary key column for the WHERE clause
-    const mapping = mapToMysql[tableName] || {};
-    const pkCol = mapping[keyField] || keyField;
+    try {
+      const db = getMySqlPool();
+      const formatted = formatForInsert(tableName, updateData);
+      
+      // Find the primary key column for the WHERE clause
+      const mapping = mapToMysql[tableName] || {};
+      const pkCol = mapping[keyField] || keyField;
 
-    const keys = Object.keys(formatted);
-    if (keys.length === 0) return updateData;
+      const keys = Object.keys(formatted);
+      if (keys.length === 0) return updateData;
 
-    const setClause = keys.map(k => `\`${k}\` = ?`).join(', ');
-    const values = keys.map(k => formatted[k]);
-    values.push(keyValue);
+      const setClause = keys.map(k => `\`${k}\` = ?`).join(', ');
+      const values = keys.map(k => formatted[k]);
+      values.push(keyValue);
 
-    const query = `UPDATE \`${tableName}\` SET ${setClause} WHERE \`${pkCol}\` = ?`;
-    await db.execute(query, values);
-    
-    return { ...updateData, [keyField]: keyValue };
+      const query = `UPDATE \`${tableName}\` SET ${setClause} WHERE \`${pkCol}\` = ?`;
+      await db.execute(query, values);
+      
+      return { ...updateData, [keyField]: keyValue };
+    } catch (error) {
+      console.error(`[MySQL Error] Failed to update ${tableName} [${keyField}=${keyValue}]:`, error);
+      return null;
+    }
   },
 
   delete: async (tableName: string, keyField: string, keyValue: string): Promise<boolean> => {
-    await ensureInit();
-    const db = getMySqlPool();
-    const mapping = mapToMysql[tableName] || {};
-    const pkCol = mapping[keyField] || keyField;
+    try {
+      const db = getMySqlPool();
+      const mapping = mapToMysql[tableName] || {};
+      const pkCol = mapping[keyField] || keyField;
 
-    const query = `DELETE FROM \`${tableName}\` WHERE \`${pkCol}\` = ?`;
-    const [result]: any = await db.execute(query, [keyValue]);
-    return result.affectedRows > 0;
+      const query = `DELETE FROM \`${tableName}\` WHERE \`${pkCol}\` = ?`;
+      const [result]: any = await db.execute(query, [keyValue]);
+      return result.affectedRows > 0;
+    } catch (error) {
+      console.error(`[MySQL Error] Failed to delete from ${tableName} [${keyField}=${keyValue}]:`, error);
+      return false;
+    }
   }
 };

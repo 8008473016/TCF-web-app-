@@ -1,15 +1,4 @@
 export const config = {
-  adminSecret: process.env.ADMIN_SECRET || 'admin123',
-  google: {
-    serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || '',
-    privateKey: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    sheetId: process.env.GOOGLE_SHEET_ID || '',
-    driveFolderId: process.env.GOOGLE_DRIVE_FOLDER_ID || '',
-  }
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  isProduction: process.env.NODE_ENV === 'production'
 };
-
-export const isGoogleConfigured = !!(
-  config.google.serviceAccountEmail &&
-  config.google.privateKey &&
-  config.google.sheetId
-);
