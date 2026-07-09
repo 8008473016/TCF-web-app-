@@ -8,10 +8,15 @@ export async function GET(
 ) {
   try {
     const { path: pathSegments } = await params;
-    let uploadsDir = path.resolve(process.cwd(), 'public/uploads');
-    if (process.env.NODE_ENV === 'production' || process.env.FORCE_EXTERNAL_UPLOADS === 'true') {
-      uploadsDir = '/home/u372321620/uploads';
+    
+    // In production, images are hosted on the Hostinger server
+    if (process.env.NODE_ENV === 'production') {
+      const externalUrl = `https://tenalicentralfurnitures.com/uploads/${pathSegments.join('/')}`;
+      return NextResponse.redirect(externalUrl);
     }
+
+    // In local development, read from local public/uploads
+    let uploadsDir = path.resolve(process.cwd(), 'public/uploads');
 
     const filePath = path.join(uploadsDir, ...pathSegments);
 
