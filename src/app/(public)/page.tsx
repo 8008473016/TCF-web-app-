@@ -184,38 +184,49 @@ export default async function HomePage() {
       <HeroSlider banners={banners} />
 
       {/* Categories Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full">
-        <div className="text-center space-y-2">
-          <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Exquisite Designs</span>
-          <h2 className="text-3xl sm:text-4xl font-serif font-black text-tcf-dark">Shop By Category</h2>
-          <div className="w-16 h-0.5 bg-tcf-red mx-auto mt-4" />
-        </div>
+      {(() => {
+        const featuredCategorySlugs = settings?.featuredCategorySlugs || [];
+        const displayedCategories = featuredCategorySlugs.length > 0
+          ? featuredCategorySlugs
+              .map((slug: string) => categories.find((c: any) => String(c.slug || c['Slug']) === String(slug)))
+              .filter(Boolean)
+          : categories.slice(0, 8);
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {categories.slice(0, 8).map((cat: any) => (
-            <Link 
-              key={cat.databaseId || cat.slug || cat['Category ID']} 
-              href={`/products?category=${cat.slug || cat['Slug']}`}
-              className="group relative h-64 overflow-hidden border border-tcf-sand hover:shadow-premium bg-tcf-dark rounded-2xl"
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-tcf-dark/95 via-tcf-dark/30 to-transparent z-10" />
-              <img 
-                src={cat.banner || cat['Banner'] || "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80"} 
-                alt={cat.name || cat['Category Name']}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-80"
-              />
-              <div className="absolute inset-x-0 bottom-0 p-5 z-20 text-center">
-                <h3 className="font-serif font-bold text-base text-white group-hover:text-tcf-red transition-colors">
-                  {cat.name || cat['Category Name']}
-                </h3>
-                <p className="text-[10px] text-white/70 tracking-wider uppercase mt-1.5 font-bold group-hover:text-white transition-colors flex items-center justify-center gap-1">
-                  View Catalog <ArrowRight className="w-3 h-3" />
-                </p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+        return (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full">
+            <div className="text-center space-y-2">
+              <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Exquisite Designs</span>
+              <h2 className="text-3xl sm:text-4xl font-serif font-black text-tcf-dark">Shop By Category</h2>
+              <div className="w-16 h-0.5 bg-tcf-red mx-auto mt-4" />
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {displayedCategories.map((cat: any) => (
+                <Link 
+                  key={cat.databaseId || cat.slug || cat['Category ID']} 
+                  href={`/products?category=${cat.slug || cat['Slug']}`}
+                  className="group relative h-64 overflow-hidden border border-tcf-sand hover:shadow-premium bg-tcf-dark rounded-2xl"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-tcf-dark/95 via-tcf-dark/30 to-transparent z-10" />
+                  <img 
+                    src={cat.banner || cat['Banner'] || "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80"} 
+                    alt={cat.name || cat['Category Name']}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out opacity-80"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 p-5 z-20 text-center">
+                    <h3 className="font-serif font-bold text-base text-white group-hover:text-tcf-red transition-colors">
+                      {cat.name || cat['Category Name']}
+                    </h3>
+                    <p className="text-[10px] text-white/70 tracking-wider uppercase mt-1.5 font-bold group-hover:text-white transition-colors flex items-center justify-center gap-1">
+                      View Catalog <ArrowRight className="w-3 h-3" />
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        );
+      })()}
 
       {/* Signature Bestsellers */}
       <section className="bg-white border-y border-tcf-sand/80 py-16 w-full">

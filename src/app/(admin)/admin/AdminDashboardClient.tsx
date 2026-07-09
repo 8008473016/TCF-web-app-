@@ -104,7 +104,7 @@ export const AdminDashboardClient: React.FC = () => {
 
   // Media Library Dialog Selector (Wordpress-style picker)
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<'product-gallery' | 'cms-banner' | 'media-replace' | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'product-gallery' | 'cms-banner' | 'media-replace' | 'category-banner' | null>(null);
   const [bannerPickerIndex, setBannerPickerIndex] = useState<number | null>(null);
 
   // Media CRUD state
@@ -596,6 +596,11 @@ export const AdminDashboardClient: React.FC = () => {
       const list = [...cmsSettings.banners];
       list[bannerPickerIndex].image = url;
       setCmsSettings({ ...cmsSettings, banners: list });
+    } else if (mediaPickerTarget === 'category-banner') {
+      setCategoryForm({
+        ...categoryForm,
+        banner: url
+      });
     }
     setIsMediaPickerOpen(false);
     setMediaPickerTarget(null);
@@ -1720,72 +1725,194 @@ export const AdminDashboardClient: React.FC = () => {
                     </div>
                   )}
 
-                  {activeHomeSection === 'categories' && (
-                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
-                      <div className="flex justify-between items-center">
+                  {activeHomeSection === 'categories' && cmsSettings && (
+                    <div className="space-y-6">
+                      {/* Sub-Panel 1: Homepage Featured Categories Selector */}
+                      <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
                         <div>
-                          <h2 className="text-xl font-serif font-bold text-[#121110]">Showroom Categories</h2>
-                          <p className="text-xs text-gray-500 font-mono">Add, edit details, upload banners, or delete categories used in the showroom catalogue.</p>
+                          <h3 className="text-base font-serif font-bold text-[#121110]">Homepage Featured Categories</h3>
+                          <p className="text-xs text-gray-500">Select which categories appear on the homepage "Shop By Category" section and in what order.</p>
                         </div>
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleImportAction('sync')}
-                            className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
-                          >
-                            <Download className="w-4 h-4" /> Sync Folders
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleImportAction('generate_missing')}
-                            className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
-                          >
-                            <RefreshCw className="w-4 h-4" /> Generate AI Details
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleImportAction('regenerate_all')}
-                            className="px-3.5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
-                          >
-                            <RotateCcw className="w-4 h-4" /> Regenerate AI Details
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenCategoryModal()}
-                            className="px-3.5 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
-                          >
-                            <Plus className="w-4 h-4" /> Add Category
-                          </button>
+
+                        <div className="space-y-4">
+                          <div className="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Add Category to Homepage</span>
+                            <div className="flex gap-2">
+                              <select
+                                id="add-featured-category-select"
+                                className="flex-1 px-3 py-2 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                              >
+                                <option value="">Select a category...</option>
+                                {categories.map(c => (
+                                  <option key={c.slug} value={c.slug}>{c.name} ({c.slug})</option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const sel = document.getElementById('add-featured-category-select') as HTMLSelectElement;
+                                  if (!sel || !sel.value) return;
+                                  const slug = sel.value;
+                                  if ((cmsSettings.featuredCategorySlugs || []).includes(slug)) return alert('Category already in featured list.');
+                                  const list = [...(cmsSettings.featuredCategorySlugs || []), slug];
+                                  setCmsSettings({ ...cmsSettings, featuredCategorySlugs: list });
+                                }}
+                                className="px-4 py-2 bg-gray-800 text-white font-bold text-xs uppercase rounded-lg hover:bg-gray-700"
+                              >
+                                Add
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 gap-2">
+                            {(cmsSettings.featuredCategorySlugs || []).map((slug: string, index: number) => {
+                              const cat = categories.find(c => c.slug === slug);
+                              return (
+                                <div key={slug} className="flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-white">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+                                      {cat?.banner || cat?.Banner ? (
+                                        <img src={cat.banner || cat.Banner} alt="" className="w-full h-full object-cover" />
+                                      ) : (
+                                        <ImageIcon className="w-5 h-5 text-gray-400" />
+                                      )}
+                                    </div>
+                                    <div>
+                                      <h4 className="text-xs font-bold text-[#121110]">{cat?.name || slug}</h4>
+                                      <span className="text-[10px] text-gray-450 font-mono">{slug}</span>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (index === 0) return;
+                                        const list = [...cmsSettings.featuredCategorySlugs];
+                                        const temp = list[index - 1];
+                                        list[index - 1] = list[index];
+                                        list[index] = temp;
+                                        setCmsSettings({ ...cmsSettings, featuredCategorySlugs: list });
+                                      }}
+                                      disabled={index === 0}
+                                      className="p-1 text-gray-400 hover:text-gray-750 disabled:opacity-30"
+                                    >
+                                      <ArrowUp className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        if (index === cmsSettings.featuredCategorySlugs.length - 1) return;
+                                        const list = [...cmsSettings.featuredCategorySlugs];
+                                        const temp = list[index + 1];
+                                        list[index + 1] = list[index];
+                                        list[index] = temp;
+                                        setCmsSettings({ ...cmsSettings, featuredCategorySlugs: list });
+                                      }}
+                                      disabled={index === cmsSettings.featuredCategorySlugs.length - 1}
+                                      className="p-1 text-gray-400 hover:text-gray-755 disabled:opacity-30"
+                                    >
+                                      <ArrowDown className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const list = cmsSettings.featuredCategorySlugs.filter((s: string) => s !== slug);
+                                        setCmsSettings({ ...cmsSettings, featuredCategorySlugs: list });
+                                      }}
+                                      className="p-1 text-red-500 hover:text-red-700 ml-1"
+                                    >
+                                      <Trash className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                            {(cmsSettings.featuredCategorySlugs || []).length === 0 && (
+                              <p className="text-xs text-gray-500 text-center py-4 bg-gray-50 border border-dashed border-gray-200 rounded-xl">
+                                No featured categories selected. The website will automatically fall back to showing the first 8 categories.
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="flex justify-end pt-2">
+                            <button
+                              type="button"
+                              onClick={handleSaveCmsSettings}
+                              className="px-6 py-2.5 bg-[#DE2943] text-white hover:bg-red-750 font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                            >
+                              <Save className="w-4 h-4" /> Save Homepage Categories
+                            </button>
+                          </div>
                         </div>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                        {categories.map((c) => (
-                          <div key={c.databaseId || c.slug} className={`border border-gray-200 p-4 bg-gray-50 rounded-xl space-y-2 relative group ${!c.registered ? 'border-amber-300 bg-amber-50/30' : ''}`}>
-                            {c.registered && (
-                              <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <button
-                                  type="button"
-                                  onClick={() => handleOpenCategoryModal(c)}
-                                  className="text-blue-500 hover:text-blue-700 bg-white p-1 rounded border border-gray-200"
-                                  title="Edit Category"
-                                >
-                                  <Edit className="w-3.5 h-3.5" />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => handleDeleteCategory(c.databaseId!)}
-                                  className="text-red-500 hover:text-red-700 bg-white p-1 rounded border border-gray-200"
-                                  title="Delete Category"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            )}
-                            <span className="text-[10px] font-bold text-gray-500 uppercase">Slug: {c.slug}</span>
-                            <h4 className="font-serif font-bold text-sm text-[#121110]">{c.name}</h4>
-                            <p className="text-[11px] text-gray-500 leading-relaxed truncate">{c.description}</p>
+
+                      {/* Sub-Panel 2: Global Showroom Categories Catalog */}
+                      <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <h3 className="text-base font-serif font-bold text-[#121110]">Category Catalog Details</h3>
+                            <p className="text-xs text-gray-500">Edit descriptions, custom SEO details, and banner images for all categories in your showroom catalog.</p>
                           </div>
-                        ))}
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleImportAction('sync')}
+                              className="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                            >
+                              <Download className="w-4 h-4" /> Sync Folders
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleImportAction('generate_missing')}
+                              className="px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                            >
+                              <RefreshCw className="w-4 h-4" /> Generate AI Details
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleImportAction('regenerate_all')}
+                              className="px-3.5 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                            >
+                              <RotateCcw className="w-4 h-4" /> Regenerate AI Details
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleOpenCategoryModal()}
+                              className="px-3.5 py-2 bg-[#DE2943] hover:bg-red-750 text-white font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                            >
+                              <Plus className="w-4 h-4" /> Add Category
+                            </button>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                          {categories.map((c) => (
+                            <div key={c.databaseId || c.slug} className={`border border-gray-200 p-4 bg-gray-50 rounded-xl space-y-2 relative group ${!c.registered ? 'border-amber-300 bg-amber-50/30' : ''}`}>
+                              {c.registered && (
+                                <div className="absolute top-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleOpenCategoryModal(c)}
+                                    className="text-blue-500 hover:text-blue-700 bg-white p-1 rounded border border-gray-200 cursor-pointer"
+                                    title="Edit Category"
+                                  >
+                                    <Edit className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteCategory(c.databaseId!)}
+                                    className="text-red-500 hover:text-red-700 bg-white p-1 rounded border border-gray-200 cursor-pointer"
+                                    title="Delete Category"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              )}
+                              <span className="text-[10px] font-bold text-gray-500 uppercase">Slug: {c.slug}</span>
+                              <h4 className="font-serif font-bold text-sm text-[#121110]">{c.name}</h4>
+                              <p className="text-[11px] text-gray-500 leading-relaxed truncate">{c.description}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   )}
@@ -3234,12 +3361,24 @@ export const AdminDashboardClient: React.FC = () => {
               </div>
               <div className="space-y-1">
                 <label className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Banner Image URL</label>
-                <input
-                  type="text"
-                  value={categoryForm.banner}
-                  onChange={(e) => setCategoryForm({ ...categoryForm, banner: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={categoryForm.banner}
+                    onChange={(e) => setCategoryForm({ ...categoryForm, banner: e.target.value })}
+                    className="flex-1 px-3 py-1.5 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMediaPickerTarget('category-banner');
+                      setIsMediaPickerOpen(true);
+                    }}
+                    className="px-3 py-1.5 bg-gray-800 text-white font-bold text-[10px] uppercase rounded-lg hover:bg-gray-700"
+                  >
+                    Select Image
+                  </button>
+                </div>
               </div>
               <div className="flex justify-end gap-2 pt-4">
                 <button
