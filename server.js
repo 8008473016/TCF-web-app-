@@ -14,8 +14,15 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('[CRITICAL] Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
+process.env.NODE_ENV = process.env.NODE_ENV || 'production';
 const dev = process.env.NODE_ENV !== 'production';
 const hostname = '0.0.0.0';
+
+// Limit threads for sharp/Next.js internals at runtime
+process.env.RAYON_NUM_THREADS = '1';
+process.env.UV_THREADPOOL_SIZE = '1';
+process.env.VIPS_CONCURRENCY = '1';
+
 // Parse port as integer. If Hostinger passes a Unix socket path (string), this falls back to 3000
 // Passenger will intercept this listen(3000) call anyway and map it to its own socket.
 const port = parseInt(process.env.PORT, 10) || 3000;
