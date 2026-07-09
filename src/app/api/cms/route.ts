@@ -57,9 +57,11 @@ export async function PUT(req: NextRequest) {
           ? JSON.stringify(newSettings[key]) 
           : String(newSettings[key]);
         
-        try {
+        const exists = checkArray.some((item: any) => item.Key === key || item.key === key || item.setting_key === key);
+        
+        if (exists) {
           await db.update('settings', 'Key', key, { Value: valueStr });
-        } catch {
+        } else {
           await db.insert('settings', { Key: key, Value: valueStr });
         }
       }
