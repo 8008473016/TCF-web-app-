@@ -1,50 +1,53 @@
 # Deployment Instructions
 
-Follow these steps exactly to safely deploy the new TCF Furniture application and database updates to Hostinger.
+Follow these exact steps to cleanly and safely import your products database into Hostinger using the single-file method.
 
 ## Step 1: Pull Latest Code
-Log into your Hostinger terminal or SSH and navigate to your project directory. Pull the latest source code from GitHub:
+Log into your Hostinger terminal or SSH and pull the latest code:
 ```bash
 git pull origin main
 ```
 
-## Step 2: Install Dependencies
-Install any new dependencies required by the updated project:
+## Step 2: Install and Build
+Install dependencies and generate the Next.js production build:
 ```bash
 npm install
-```
-
-## Step 3: Build the Project
-Generate the optimized production build for Next.js:
-```bash
 npm run build
 ```
 
-## Step 4: Restart Node Application
-Restart the running Node.js application (via PM2, Hostinger control panel, or your specific process manager) to apply the code changes:
-```bash
-pm2 restart tcf-web-app
-# OR restart via Hostinger dashboard
-```
+## Step 3: Restart Node Application
+Restart your running Node.js application (via PM2 or Hostinger control panel) to apply the code changes.
 
-## Step 5: Update Database Schema
-We need to ensure your Hostinger database has the correct new columns for AI tracking before importing the data.
+## Step 4: Import SQL to phpMyAdmin
+We have consolidated everything into one highly compatible, error-free file.
 
 1. Open **phpMyAdmin** in your Hostinger control panel.
 2. Select your TCF database.
 3. Click on the **Import** tab.
-4. Upload the `deployment/schema_update.sql` file and execute it.
+4. Upload `deployment/full_products_import.sql`.
+5. Execute the import.
 
-## Step 6: Import Database Seed
-Now that the schema is updated, we can safely import the AI-generated data.
+*Note: This script strictly creates `_new` tables (e.g. `products_new`). It will not break or modify your existing active tables during import.*
 
-1. Still in phpMyAdmin, click on the **Import** tab again.
-2. Upload the `deployment/database_seed.sql` file.
-3. Execute the import.
+## Step 5: Execute Final Rename Commands
+Once the import finishes successfully, you can switch the old tables with the new ones.
+Run this exact SQL command in the **SQL** tab of phpMyAdmin:
 
-## Step 7: Verify Images
-Visit the live production website and verify that product images load correctly.
-The database has been configured to load images exclusively from:
-`/uploads/Products/`
+```sql
+-- 1. Backup existing tables (if they exist)
+RENAME TABLE products TO products_backup;
+RENAME TABLE categories TO categories_backup;
+RENAME TABLE product_images TO product_images_backup;
+RENAME TABLE settings TO settings_backup;
 
-*Note: The images themselves are not tracked in Git. This relies entirely on the images you have already manually uploaded to the Hostinger File Manager in the `public/uploads/Products` directory.*
+-- 2. Activate the newly imported tables
+RENAME TABLE products_new TO products;
+RENAME TABLE categories_new TO categories;
+RENAME TABLE product_images_new TO product_images;
+RENAME TABLE settings_new TO settings;
+```
+
+*(If you ever need to rollback, you can simply rename the backup tables back.)*
+
+## Step 6: Verify Images
+Visit the live production website and verify that product images load correctly from `/uploads/Products/`.

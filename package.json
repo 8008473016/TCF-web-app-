@@ -8,7 +8,7 @@
     "start": "NODE_ENV=production node server.js",
     "lint": "eslint",
     "import:products": "node scripts/import-products-from-folders.js",
-    "export:sql": "node scripts/export-json-to-hostinger-sql.js"
+    "export:sql": "node scripts/export-full-import.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
