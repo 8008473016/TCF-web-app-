@@ -69,10 +69,15 @@ export default async function HomePage() {
   const banners = settings?.banners || defaultBanners;
 
   // Filter out featured products and format them for ProductCard
-  const featuredProducts = products
-    .filter((p: any) => (p.featured === true || p['Featured'] === true || p['Featured'] === 'TRUE') && !(p.archived === true || p['Archived'] === true || p['Archived'] === 'TRUE'))
-    .slice(0, 4)
-    .map((p: any) => ({
+  const bestsellerIds = settings?.bestsellerIds || [];
+  
+  const rawFeatured = bestsellerIds.length > 0 
+    ? bestsellerIds.map((id: string) => products.find((p: any) => String(p.id) === String(id) || String(p.sku) === String(id))).filter(Boolean)
+    : products
+        .filter((p: any) => (p.featured === true || p.featured === 1 || p['Featured'] === true || p['Featured'] === 'TRUE') && !(p.archived === true || p.archived === 1 || p['Archived'] === true || p['Archived'] === 'TRUE'))
+        .slice(0, 4);
+
+  const featuredProducts = rawFeatured.map((p: any) => ({
       id: String(p.id || p['Product ID'] || ''),
       sku: String(p.sku || p['SKU'] || ''),
       name: String(p.name || p['Product Name'] || ''),
@@ -84,7 +89,7 @@ export default async function HomePage() {
       images: Array.isArray(p.images) 
         ? p.images 
         : typeof p.images === 'string' 
-          ? JSON.parse(p.images) 
+          ? (() => { try { return JSON.parse(p.images); } catch { return []; } })()
           : typeof p['Images'] === 'string' 
             ? p['Images'].split(',').map((img: string) => img.trim()).filter(Boolean)
             : [],
