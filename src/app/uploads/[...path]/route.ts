@@ -9,9 +9,10 @@ export async function GET(
   try {
     const { path: pathSegments } = await params;
     
-    // If we are running on Render, redirect to Hostinger
+    // If we are running on Render, redirect to Hostinger using the new CDN subdomain
     if (process.env.RENDER === 'true') {
-      const externalUrl = `https://tenalicentralfurnitures.com/uploads/${pathSegments.join('/')}`;
+      const cdnDomain = process.env.NEXT_PUBLIC_CDN_URL || 'https://cdn.tenalicentralfurnitures.com';
+      const externalUrl = `${cdnDomain}/uploads/${pathSegments.join('/')}`;
       return NextResponse.redirect(externalUrl);
     }
 
