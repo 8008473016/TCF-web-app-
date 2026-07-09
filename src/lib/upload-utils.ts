@@ -33,7 +33,7 @@ export async function uploadFile(
       stream.push(null);
 
       // FTP root is usually public_html (as per Hostinger screenshot)
-      const ftpDir = `public_html/uploads/${subDir}`.replace(/\\/g, '/');
+      const ftpDir = `/public_html/uploads/${subDir}`.replace(/\\/g, '/');
       await client.ensureDir(ftpDir);
       await client.uploadFrom(stream, fileName);
 
