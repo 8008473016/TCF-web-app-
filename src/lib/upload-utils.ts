@@ -1,61 +1,39 @@
-import { existsSync, mkdirSync } from 'fs';
-import { writeFile } from 'fs/promises';
-import path from 'path';
-import { Client } from 'basic-ftp';
-import { Readable } from 'stream';
+import { v2 as cloudinary } from 'cloudinary';
+
+// Configure cloudinary using the provided credentials
+cloudinary.config({
+  cloud_name: 'pqp0ihf2',
+  api_key: '574596185212916',
+  api_secret: '_6sxtzAG820pg2-qBZrIDlpA0jg'
+});
 
 export async function uploadFile(
   buffer: Buffer, 
-  subDir: string, // e.g., 'products/sofas'
+  subDir: string, // e.g., 'media/general'
   fileName: string // e.g., 'my-image.jpg'
 ): Promise<string> {
-  const ftpHost = process.env.FTP_HOST;
-  const ftpUser = process.env.FTP_USER;
-  const ftpPass = process.env.FTP_PASSWORD;
-  
-  const publicUrl = `/uploads/${subDir}/${fileName}`.replace(/\\/g, '/');
+  return new Promise((resolve, reject) => {
+    // Cloudinary automatically handles extensions, so we can strip it from public_id if desired, 
+    // or keep it. It's safer to strip to avoid '.jpg.jpg'.
+    const publicId = fileName.replace(/\.[^/.]+$/, "");
+    
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: `tcf/${subDir}`,
+        public_id: publicId
+      },
+      (error, result) => {
+        if (error || !result) {
+          console.error('[CLOUDINARY UPLOAD ERROR]:', error);
+          reject(new Error('Failed to upload file via Cloudinary: ' + String(error?.message || error)));
+        } else {
+          // Return the absolute HTTPS URL from Cloudinary
+          resolve(result.secure_url);
+        }
+      }
+    );
 
-  // Use FTP if credentials are provided
-  if (ftpHost && ftpUser && ftpPass) {
-    const client = new Client();
-    client.ftp.verbose = process.env.NODE_ENV !== 'production';
-
-    try {
-      await client.access({
-        host: ftpHost,
-        user: ftpUser,
-        password: ftpPass,
-        secure: false, 
-      });
-
-      const stream = new Readable();
-      stream.push(buffer);
-      stream.push(null);
-
-      // FTP root is usually public_html (as per Hostinger screenshot)
-      const ftpDir = `/public_html/uploads/${subDir}`.replace(/\\/g, '/');
-      await client.ensureDir(ftpDir);
-      await client.uploadFrom(stream, fileName);
-
-      return publicUrl;
-    } catch (err) {
-      console.error('[FTP UPLOAD ERROR]:', err);
-      throw new Error('Failed to upload file via FTP: ' + String(err));
-    } finally {
-      client.close();
-    }
-  }
-
-  // Fallback to local file system
-  const uploadRoot = process.env.UPLOADS_BASE_DIR || path.join(process.cwd(), "public", "uploads");
-  const targetDir = path.join(uploadRoot, subDir);
-  
-  if (!existsSync(targetDir)) {
-    mkdirSync(targetDir, { recursive: true });
-  }
-
-  const targetFilePath = path.join(targetDir, fileName);
-  await writeFile(targetFilePath, buffer);
-
-  return publicUrl;
+    // Write the buffer to the stream
+    uploadStream.end(buffer);
+  });
 }
