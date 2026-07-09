@@ -17,23 +17,27 @@ export async function GET(req: NextRequest) {
     const categories = await db.read('categories');
     
     // Filter invalid categories
-    const validCategories = categories.filter((c: any) => c.name && c.slug && c.slug.trim() !== '');
+    const validCategories = categories.filter((c: any) => {
+      const name = c.name || c['Category Name'];
+      const slug = c.slug || c['Slug'];
+      return name && slug && String(slug).trim() !== '';
+    });
 
     const url = new URL(req.url);
     const isAdminRequest = url.searchParams.get('admin') === 'true';
 
     const formatted = validCategories.map((c: any) => ({
-      id: c.id ? parseInt(c.id, 10) : null,
-      databaseId: c.id ? parseInt(c.id, 10) : null, // keep this just in case frontend relies on it
-      slug: c.slug,
-      name: c.name,
-      description: c.description || '',
-      image_url: c.image_url || '',
-      banner: c.banner || '',
-      status: c.status,
-      sort_order: c.sort_order,
-      createdAt: c.created_at,
-      updatedAt: c.updated_at,
+      id: c.id || c['Category ID'] ? parseInt(c.id || c['Category ID'], 10) : null,
+      databaseId: c.id || c['Category ID'] ? parseInt(c.id || c['Category ID'], 10) : null,
+      slug: c.slug || c['Slug'],
+      name: c.name || c['Category Name'],
+      description: c.description || c['Description'] || '',
+      image_url: c.image_url || c.banner || c['Banner'] || '',
+      banner: c.banner || c['Banner'] || '',
+      status: c.status || c['Status'],
+      sort_order: c.sort_order || c['Sort Order'],
+      createdAt: c.created_at || c['Created At'],
+      updatedAt: c.updated_at || c['Updated At'],
       registered: true
     }));
 

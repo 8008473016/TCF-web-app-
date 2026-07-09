@@ -72,7 +72,7 @@ export default async function HomePage() {
   const bestsellerIds = settings?.bestsellerIds || [];
   
   const rawFeatured = bestsellerIds.length > 0 
-    ? bestsellerIds.map((id: string) => products.find((p: any) => String(p.id) === String(id) || String(p.sku) === String(id))).filter(Boolean)
+    ? bestsellerIds.map((id: string) => products.find((p: any) => String(p.id || p['Product ID']) === String(id) || String(p.sku || p['SKU']) === String(id))).filter(Boolean)
     : products
         .filter((p: any) => (p.featured === true || p.featured === 1 || p['Featured'] === true || p['Featured'] === 'TRUE') && !(p.archived === true || p.archived === 1 || p['Archived'] === true || p['Archived'] === 'TRUE'))
         .slice(0, 4);
