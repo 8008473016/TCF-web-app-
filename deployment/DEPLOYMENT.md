@@ -27,16 +27,22 @@ pm2 restart tcf-web-app
 # OR restart via Hostinger dashboard
 ```
 
-## Step 5: Import Database Seed
-We have generated a safe SQL export that inserts and updates the AI-generated products and categories WITHOUT dropping or deleting any existing tables.
+## Step 5: Update Database Schema
+We need to ensure your Hostinger database has the correct new columns for AI tracking before importing the data.
 
 1. Open **phpMyAdmin** in your Hostinger control panel.
 2. Select your TCF database.
 3. Click on the **Import** tab.
-4. Upload the `deployment/database_seed.sql` file.
-5. Execute the import.
+4. Upload the `deployment/schema_update.sql` file and execute it.
 
-## Step 6: Verify Images
+## Step 6: Import Database Seed
+Now that the schema is updated, we can safely import the AI-generated data.
+
+1. Still in phpMyAdmin, click on the **Import** tab again.
+2. Upload the `deployment/database_seed.sql` file.
+3. Execute the import.
+
+## Step 7: Verify Images
 Visit the live production website and verify that product images load correctly.
 The database has been configured to load images exclusively from:
 `/uploads/Products/`
