@@ -15,8 +15,8 @@ const getSettings = async () => {
     if (Array.isArray(rawSettings)) {
       const settingsObj: any = {};
       rawSettings.forEach((item: any) => {
-        const key = item.Key || item.key;
-        const val = item.Value || item.value;
+        const key = item.Key || item.key || item.setting_key;
+        const val = item.Value || item.value || item.setting_value;
         if (key) {
           try {
             settingsObj[key] = JSON.parse(val);
