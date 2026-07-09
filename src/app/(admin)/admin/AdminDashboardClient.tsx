@@ -693,6 +693,24 @@ export const AdminDashboardClient: React.FC = () => {
     setCmsSettings({ ...cmsSettings, banners: list });
   };
 
+  const moveHeroBannerUp = (idx: number) => {
+    if (!cmsSettings || idx === 0) return;
+    const list = [...cmsSettings.banners];
+    const temp = list[idx - 1];
+    list[idx - 1] = list[idx];
+    list[idx] = temp;
+    setCmsSettings({ ...cmsSettings, banners: list });
+  };
+
+  const moveHeroBannerDown = (idx: number) => {
+    if (!cmsSettings || idx === cmsSettings.banners.length - 1) return;
+    const list = [...cmsSettings.banners];
+    const temp = list[idx + 1];
+    list[idx + 1] = list[idx];
+    list[idx] = temp;
+    setCmsSettings({ ...cmsSettings, banners: list });
+  };
+
   const addFAQ = () => {
     if (!cmsSettings) return;
     const newFAQ = {
@@ -1310,13 +1328,34 @@ export const AdminDashboardClient: React.FC = () => {
                       <div className="space-y-4">
                         {cmsSettings.banners?.map((slide: any, idx: number) => (
                           <div key={slide.id || idx} className="border border-gray-200 p-4 rounded-xl bg-gray-50 relative space-y-4">
-                            <button
-                              type="button"
-                              onClick={() => removeHeroBanner(idx)}
-                              className="absolute top-3 right-3 text-red-500 hover:text-red-700"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
+                            <div className="absolute top-3 right-3 flex items-center space-x-3">
+                              <button
+                                type="button"
+                                onClick={() => moveHeroBannerUp(idx)}
+                                disabled={idx === 0}
+                                className={`text-gray-400 hover:text-gray-700 ${idx === 0 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                title="Move Up"
+                              >
+                                <ArrowUp className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveHeroBannerDown(idx)}
+                                disabled={idx === cmsSettings.banners.length - 1}
+                                className={`text-gray-400 hover:text-gray-700 ${idx === cmsSettings.banners.length - 1 ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                title="Move Down"
+                              >
+                                <ArrowDown className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeHeroBanner(idx)}
+                                className="text-red-500 hover:text-red-700"
+                                title="Delete Slide"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
                             <span className="text-[10px] font-bold text-[#DE2943] uppercase tracking-wider">Slide #{idx + 1}</span>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
