@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tenali Central Furniture",
     description: "Premium handcrafted solid wood furniture in Andhra Pradesh.",
-    images: ["/logo.jpg"],
+    images: ["/cover-photo.jpeg"],
   }
 };
 

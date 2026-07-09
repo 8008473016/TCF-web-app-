@@ -151,8 +151,8 @@ export default async function HomePage() {
             "@context": "https://schema.org",
             "@type": "FurnitureStore",
             "name": "Tenali Central Furniture (TCF)",
-            "image": "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=800&q=80",
-            "@id": "https://tenalicentralfurniture.com",
+            "image": "https://tenalicentralfurnitures.com/cover-photo.jpeg",
+            "@id": "https://tenalicentralfurnitures.com",
             "url": "https://tenalicentralfurniture.com",
             "telephone": phone,
             "address": {
