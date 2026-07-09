@@ -1771,8 +1771,8 @@ export const AdminDashboardClient: React.FC = () => {
                                 <div key={slug} className="flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-white">
                                   <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
-                                      {cat?.banner || cat?.Banner ? (
-                                        <img src={cat.banner || cat.Banner} alt="" className="w-full h-full object-cover" />
+                                      {cat?.banner ? (
+                                        <img src={cat.banner} alt="" className="w-full h-full object-cover" />
                                       ) : (
                                         <ImageIcon className="w-5 h-5 text-gray-400" />
                                       )}
