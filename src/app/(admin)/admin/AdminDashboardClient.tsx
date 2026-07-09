@@ -1783,6 +1783,16 @@ export const AdminDashboardClient: React.FC = () => {
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-1">
+                                     {cat && (
+                                       <button
+                                         type="button"
+                                         onClick={() => handleOpenCategoryModal(cat)}
+                                         className="p-1 text-blue-500 hover:text-blue-700 mr-1.5"
+                                         title="Edit Category Details & Image"
+                                       >
+                                         <Edit className="w-4 h-4" />
+                                       </button>
+                                     )}
                                     <button
                                       type="button"
                                       onClick={() => {
