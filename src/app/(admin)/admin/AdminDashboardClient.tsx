@@ -477,7 +477,8 @@ export const AdminDashboardClient: React.FC = () => {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
       }
-      fetchAllAdminData();
+      const mediaRes = await api.get('/media');
+      setMediaItems(mediaRes.data);
       alert('Images uploaded successfully!');
     } catch {
       alert('Failed to upload some assets.');
@@ -491,7 +492,8 @@ export const AdminDashboardClient: React.FC = () => {
     try {
       await api.delete(`/media/${id}`);
       setEditingMedia(null);
-      fetchAllAdminData();
+      const mediaRes = await api.get('/media');
+      setMediaItems(mediaRes.data);
     } catch {
       alert('Failed to delete media.');
     }
@@ -505,7 +507,8 @@ export const AdminDashboardClient: React.FC = () => {
         await api.delete(`/media/${id}`);
       }
       setBulkSelectMedia([]);
-      fetchAllAdminData();
+      const mediaRes = await api.get('/media');
+      setMediaItems(mediaRes.data);
       alert('Bulk deletion complete.');
     } catch {
       alert('Error during bulk deletion.');
@@ -539,7 +542,8 @@ export const AdminDashboardClient: React.FC = () => {
       await api.delete(`/media/${editingMedia.id}`);
 
       setEditingMedia(null);
-      fetchAllAdminData();
+      const mediaRes = await api.get('/media');
+      setMediaItems(mediaRes.data);
       alert('Asset replaced globally across products and sliders!');
     } catch (err) {
       console.error(err);

@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const fileName = `${Date.now()}-${file.name.replace(/\\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
-    const subDir = catSub ? `products/${catSub}` : 'products';
+    const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-').replace(/[^a-zA-Z0-9.-]/g, '')}`;
+    const subDir = catSub ? `media/${catSub}` : 'media';
     
     const fileUrl = await uploadFile(buffer, subDir, fileName);
 
