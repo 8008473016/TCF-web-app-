@@ -2787,7 +2787,7 @@ export const AdminDashboardClient: React.FC = () => {
 
       {/* --- advanced SELECT MEDIA LIBRARY DIALOG MODAL (WordPress style) --- */}
       {isMediaPickerOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div 
             className="bg-white border border-[#DE2943]/20 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl animate-scaleIn"
             onClick={(e) => e.stopPropagation()}
