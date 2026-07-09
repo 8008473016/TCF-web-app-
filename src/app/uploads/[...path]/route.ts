@@ -9,14 +9,19 @@ export async function GET(
   try {
     const { path: pathSegments } = await params;
     
-    // In production, images are hosted on the Hostinger server
-    if (process.env.NODE_ENV === 'production') {
+    // If we are running on Render, redirect to Hostinger
+    if (process.env.RENDER === 'true') {
       const externalUrl = `https://tenalicentralfurnitures.com/uploads/${pathSegments.join('/')}`;
       return NextResponse.redirect(externalUrl);
     }
 
-    // In local development, read from local public/uploads
+    // In local development or when running directly on Hostinger, serve from local files
     let uploadsDir = path.resolve(process.cwd(), 'public/uploads');
+    
+    // Fallback for Hostinger's specific path if needed
+    if (process.env.NODE_ENV === 'production' && process.env.RENDER !== 'true') {
+        uploadsDir = '/home/u372321620/uploads';
+    }
 
     const filePath = path.join(uploadsDir, ...pathSegments);
 
