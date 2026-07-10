@@ -462,12 +462,14 @@ export default async function HomePage() {
         </div>
       </section>
 
-      </div> {/* Close relative z-10 scrollable wrapper */}
+      </div> {/* Close relative z-10 scrollable wrapper (Part 1 - Above Reels) */}
 
-      {/* Instagram Reels Grid (Bottom Section) */}
+      {/* Instagram Reels Grid (Middle Section) */}
       {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
         settings?.reelsGridMode !== false ? (
-          <ReelsGrid reels={settings.reels} />
+          <div className="relative z-10 w-full bg-tcf-light">
+            <ReelsGrid reels={settings.reels} />
+          </div>
         ) : (
           <div className="relative h-[300px] sm:h-[450px] w-full overflow-hidden" style={{ clipPath: 'inset(0)' }}>
             <div className="fixed inset-0 w-full h-full z-0">
@@ -476,6 +478,34 @@ export default async function HomePage() {
           </div>
         )
       )}
+
+      {/* Scrollable sections wrapper (Part 2 - Below Reels: FAQs) */}
+      <div className="bg-tcf-light flex flex-col space-y-16 py-16 w-full relative z-10">
+        {/* FAQs Section */}
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full py-6">
+          <div className="text-center space-y-2">
+            <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Got Questions?</span>
+            <h2 className="text-3xl sm:text-4xl font-serif font-black text-tcf-dark">Frequently Asked Questions</h2>
+            <div className="w-16 h-0.5 bg-tcf-red mx-auto mt-4" />
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq: any, index: number) => (
+              <div 
+                key={index}
+                className="bg-white border border-tcf-sand p-6 rounded-2xl shadow-sm"
+              >
+                <h3 className="font-serif font-bold text-sm text-tcf-dark mb-2">
+                  Q: {faq.question}
+                </h3>
+                <p className="text-xs text-tcf-dark/70 leading-relaxed font-light">
+                  A: {faq.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
 
     </div>
   );
