@@ -471,17 +471,19 @@ export default async function HomePage() {
             <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
           </div>
         ) : (
-          <div className="relative w-full overflow-hidden" style={{ clipPath: 'inset(0)' }}>
+          <div className="relative w-full overflow-hidden">
             {/* Invisible spacer grid matching the layout & aspect-ratio of the fixed squares grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full opacity-0 pointer-events-none">
               {Array.from({ length: Math.min(settings.reelsCount || 15, (settings.reels || []).length) }).map((_, i) => (
                 <div key={i} className="aspect-square" />
               ))}
             </div>
-            {/* Stable viewport-locked background grid */}
-            <div className="fixed inset-0 w-full h-full z-0 flex items-center justify-center bg-black">
-              <div className="w-full max-h-full overflow-y-auto py-6">
-                <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
+            {/* Stable viewport-locked background grid using sticky inside absolute container */}
+            <div className="absolute inset-0 z-0">
+              <div className="sticky top-0 left-0 w-full h-screen flex items-center justify-center bg-black overflow-hidden">
+                <div className="w-full max-h-full overflow-y-auto py-6">
+                  <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
+                </div>
               </div>
             </div>
           </div>
