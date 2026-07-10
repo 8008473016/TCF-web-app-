@@ -2016,6 +2016,25 @@ export const AdminDashboardClient: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Reels Count Setting */}
+                      <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <span className="text-xs font-bold text-[#121110] block">Number of Reels to Display</span>
+                          <span className="text-[10px] text-gray-500">Choose how many reels to show in the bottom grid/parallax section (e.g. 15 for 3 rows of 5)</span>
+                        </div>
+                        <select
+                          value={cmsSettings.reelsCount || 15}
+                          onChange={(e) => setCmsSettings({ ...cmsSettings, reelsCount: Number(e.target.value) })}
+                          className="px-3 py-1.5 border border-gray-300 bg-white text-xs font-bold rounded-lg text-[#121110] cursor-pointer w-full sm:w-auto min-w-[150px]"
+                        >
+                          <option value={5}>5 Reels (1 Row)</option>
+                          <option value={10}>10 Reels (2 Rows)</option>
+                          <option value={15}>15 Reels (3 Rows)</option>
+                          <option value={20}>20 Reels (4 Rows)</option>
+                          <option value={25}>25 Reels (5 Rows)</option>
+                        </select>
+                      </div>
+
                       {/* Video Adder */}
                       <div className="p-4 border border-gray-200 rounded-xl space-y-4">
                         <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Add New Reel Video</span>

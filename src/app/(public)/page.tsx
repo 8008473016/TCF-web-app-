@@ -468,12 +468,21 @@ export default async function HomePage() {
       {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
         settings?.reelsGridMode !== false ? (
           <div className="relative z-10 w-full bg-tcf-light">
-            <ReelsGrid reels={settings.reels} />
+            <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
           </div>
         ) : (
-          <div className="relative h-[300px] sm:h-[450px] w-full overflow-hidden" style={{ clipPath: 'inset(0)' }}>
-            <div className="fixed inset-0 w-full h-full z-0">
-              <ReelsGrid reels={settings.reels} />
+          <div className="relative w-full overflow-hidden" style={{ clipPath: 'inset(0)' }}>
+            {/* Invisible spacer grid matching the layout & aspect-ratio of the fixed squares grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full opacity-0 pointer-events-none">
+              {Array.from({ length: Math.min(settings.reelsCount || 15, (settings.reels || []).length) }).map((_, i) => (
+                <div key={i} className="aspect-square" />
+              ))}
+            </div>
+            {/* Stable viewport-locked background grid */}
+            <div className="fixed inset-0 w-full h-full z-0 flex items-center justify-center bg-black">
+              <div className="w-full max-h-full overflow-y-auto py-6">
+                <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
+              </div>
             </div>
           </div>
         )

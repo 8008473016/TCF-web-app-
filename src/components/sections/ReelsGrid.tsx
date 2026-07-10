@@ -19,10 +19,11 @@ interface ReelItem {
 interface ReelsGridProps {
   reels: ReelItem[];
   isHero?: boolean;
+  limit?: number;
 }
 
-export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) => {
-  const slotCount = Math.min(5, reels.length);
+export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, limit = 15 }) => {
+  const slotCount = isHero ? 5 : Math.min(limit, reels.length);
   const [slots, setSlots] = useState<ReelItem[]>([]);
 
   useEffect(() => {
@@ -31,9 +32,11 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
     }
   }, [reels, slotCount]);
 
-  // Cycle a random slot every 6 seconds
+  // Cycle a random slot every 3s (bottom) or 6s (hero)
   useEffect(() => {
     if (reels.length <= slotCount) return;
+
+    const intervalDuration = isHero ? 6000 : 3000;
 
     const interval = setInterval(() => {
       const randomSlotIndex = Math.floor(Math.random() * slotCount);
@@ -48,21 +51,30 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
           return next;
         });
       }
-    }, 6000);
+    }, intervalDuration);
 
     return () => clearInterval(interval);
-  }, [slots, reels, slotCount]);
+  }, [slots, reels, slotCount, isHero]);
 
   if (reels.length === 0) return null;
 
-  // For mobile/tablet we use grid-cols-2 or grid-cols-3, on desktop grid-cols-5. 
-  // All elements are zero gap.
-  return (
-    <section className={`relative w-full overflow-hidden ${isHero ? 'h-[60vh] sm:h-[85vh]' : 'h-[300px] sm:h-[450px]'} bg-black`}>
-      {/* Zero Gap Side-by-Side Video Grid */}
-      <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-full w-full">
+  if (isHero) {
+    return (
+      <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-full w-full bg-black">
         {slots.map((reel, idx) => (
-          <ReelSlot key={idx} reel={reel} />
+          <ReelSlot key={idx} reel={reel} isHero={true} />
+        ))}
+      </div>
+    );
+  }
+
+  // Bottom Section: Grid of Squares with Overlay
+  return (
+    <section className="relative w-full bg-black">
+      {/* Grid of Squares */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full gap-0">
+        {slots.map((reel, idx) => (
+          <ReelSlot key={idx} reel={reel} isHero={false} />
         ))}
       </div>
 
@@ -94,7 +106,7 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
 };
 
 // Sub-component to manage individual slot state for smooth fade transitions
-const ReelSlot: React.FC<{ reel: ReelItem }> = ({ reel }) => {
+const ReelSlot: React.FC<{ reel: ReelItem; isHero: boolean }> = ({ reel, isHero }) => {
   const [currentReel, setCurrentReel] = useState<ReelItem>(reel);
   const [fade, setFade] = useState(true);
 
@@ -114,7 +126,7 @@ const ReelSlot: React.FC<{ reel: ReelItem }> = ({ reel }) => {
       href={currentReel.instagramUrl || "https://www.instagram.com/tenali_centralfurnitures/"}
       target="_blank"
       rel="noopener noreferrer"
-      className="relative block w-full h-full overflow-hidden cursor-pointer group"
+      className={`relative block w-full overflow-hidden cursor-pointer group ${isHero ? 'h-full' : 'aspect-square'}`}
     >
       <video
         src={currentReel.videoUrl + '#t=2'}
@@ -124,7 +136,6 @@ const ReelSlot: React.FC<{ reel: ReelItem }> = ({ reel }) => {
         playsInline
         className={`w-full h-full object-cover transition-opacity duration-500 ${fade ? 'opacity-100' : 'opacity-0'}`}
       />
-      {/* Subtle hover effect */}
       <div className="absolute inset-0 bg-[#DE2943]/0 hover:bg-[#DE2943]/15 transition-colors duration-300 flex items-center justify-center">
         <Play className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-75 group-hover:scale-100" />
       </div>
