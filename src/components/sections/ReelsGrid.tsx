@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Play } from 'lucide-react';
 
 const InstagramIcon = ({ className }: { className?: string }) => (
@@ -20,11 +20,16 @@ interface ReelsGridProps {
   reels: ReelItem[];
   isHero?: boolean;
   limit?: number;
+  parallax?: boolean;
 }
 
-export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, limit = 15 }) => {
-  const slotCount = isHero ? 5 : Math.min(limit, reels.length);
+export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, limit = 15, parallax = false }) => {
+  // If parallax mode is ON, we show exactly 5 reels on the screen at a time
+  const slotCount = isHero ? 5 : (parallax ? 5 : Math.min(limit, reels.length));
   const [slots, setSlots] = useState<ReelItem[]>([]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (reels.length > 0) {
@@ -56,6 +61,32 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, lim
     return () => clearInterval(interval);
   }, [slots, reels, slotCount, isHero]);
 
+  // Parallax scroll listener
+  useEffect(() => {
+    if (!parallax || isHero) return;
+
+    const handleScroll = () => {
+      if (!containerRef.current || !gridRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const viewHeight = window.innerHeight;
+
+      if (rect.top < viewHeight && rect.bottom > 0) {
+        const totalScroll = viewHeight + rect.height;
+        const currentScroll = viewHeight - rect.top;
+        const percent = Math.min(Math.max(currentScroll / totalScroll, 0), 1);
+        
+        // Translate the grid from -12% to 12% to create depth
+        const translateY = (percent - 0.5) * 24; 
+        gridRef.current.style.transform = `translateY(${translateY}%)`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [parallax, isHero]);
+
   if (reels.length === 0) return null;
 
   if (isHero) {
@@ -68,10 +99,53 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, lim
     );
   }
 
-  // Bottom Section: Grid of Squares with Overlay
+  // Parallax Mode: 1-row responsive height viewport window
+  if (parallax) {
+    return (
+      <div 
+        ref={containerRef}
+        className="relative w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] overflow-hidden bg-black z-0"
+      >
+        {/* Parallax moving grid container */}
+        <div 
+          ref={gridRef}
+          className="absolute left-0 w-full h-[130%] -top-[15%] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-0 transition-transform duration-75 ease-out"
+        >
+          {slots.map((reel, idx) => (
+            <ReelSlot key={idx} reel={reel} isHero={false} />
+          ))}
+        </div>
+
+        {/* Black Shade Overlay */}
+        <div className="absolute inset-0 bg-black/45 pointer-events-none z-10" />
+
+        {/* Centered Instagram Content Overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none px-4">
+          <div className="p-3 bg-white/15 backdrop-blur-md border border-white/20 rounded-full mb-3 animate-pulse">
+            <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          </div>
+          <h2 className="text-white text-xl sm:text-2xl font-serif font-black tracking-wider uppercase drop-shadow-md">
+            Check Our Latest Reels
+          </h2>
+          <p className="text-white/80 text-xs sm:text-sm mt-1.5 drop-shadow-sm font-medium">
+            Follow us on Instagram{' '}
+            <a 
+              href="https://www.instagram.com/tenali_centralfurnitures/" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="underline hover:text-[#DE2943] pointer-events-auto transition-colors font-bold"
+            >
+              @tenali_centralfurnitures
+            </a>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Normal Grid Mode
   return (
-    <section className="relative w-full bg-black">
-      {/* Grid of Squares */}
+    <section className="relative w-full bg-black z-10">
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 w-full gap-0">
         {slots.map((reel, idx) => (
           <ReelSlot key={idx} reel={reel} isHero={false} />
