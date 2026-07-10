@@ -9,13 +9,13 @@ import { QuoteRequestDialog } from "@/components/layout/QuoteRequestDialog";
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: "Tenali Central Furniture",
-  description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Beautiful designs, termite warranty, custom specifications.",
-  keywords: ["Furniture Store", "Teak Wood Furniture", "Custom Furniture", "Tenali Central Furniture", "Vijayawada", "Guntur"],
+  title: "Tenali Central Furniture (TCF) | Premium Wood Furniture in Tenali",
+  description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Custom teak wood beds, cushion sofas, dining tables & more. Best furniture store in Tenali.",
+  keywords: ["Tenali Furniture", "Tenali Furnitures", "Furniture in Tenali", "Furniture Store Tenali", "Teak Wood Furniture Tenali", "Tenali Central Furniture", "Custom Wood Furniture"],
   openGraph: {
-    title: "Tenali Central Furniture",
-    description: "Premium handcrafted solid wood furniture in Andhra Pradesh.",
-    images: ["/cover-photo.jpeg"],
+    title: "Tenali Central Furniture (TCF) | Tenali Furniture",
+    description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations.",
+    images: ["https://tenalicentralfurnitures.com/cover-photo.jpeg"],
   }
 };
 

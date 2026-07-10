@@ -41,7 +41,7 @@ export default async function ContactPage() {
   const email = settings?.contact?.email || 'contact@tenalicentralfurniture.com';
   const whatsapp = settings?.contact?.whatsapp || 'https://wa.me/918919546858';
   const address = settings?.contact?.address || 'Opp R.C.M Chruch, Amaravathi yards,Chenchupet, Tenali,Andhra pradesh 522202';
-  const hours = settings?.contact?.hours || '09:00 AM - 09:00 PM Daily';
+  const hours = settings?.contact?.hours || '10:00 AM - 09:00 PM Daily';
 
   return (
     <div className="bg-tcf-light min-h-screen py-16 font-sans">

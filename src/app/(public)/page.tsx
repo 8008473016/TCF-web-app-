@@ -10,9 +10,14 @@ import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "Tenali Central Furniture",
-  description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Beautiful designs, termite warranty, custom specifications.",
-  keywords: ["Furniture Store", "Teak Wood Furniture", "Custom Furniture", "Tenali Central Furniture", "Vijayawada", "Guntur"],
+  title: "Tenali Central Furniture (TCF) | Premium Wood Furniture in Tenali",
+  description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Custom teak wood beds, cushion sofas, dining tables & more. Best furniture store in Tenali.",
+  keywords: ["Tenali Furniture", "Tenali Furnitures", "Furniture in Tenali", "Furniture Store Tenali", "Teak Wood Furniture Tenali", "Tenali Central Furniture", "Custom Wood Furniture"],
+  openGraph: {
+    title: "Tenali Central Furniture (TCF) | Tenali Furniture",
+    description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations.",
+    images: ["https://tenalicentralfurnitures.com/cover-photo.jpeg"],
+  }
 };
 
 const getData = async () => {
@@ -55,7 +60,7 @@ export default async function HomePage() {
   const phone = settings?.contact?.phone || '+91 89195 46858';
   const email = settings?.contact?.email || 'tenalicentralfurnitures@gmail.com';
   const address = settings?.contact?.address || 'Opp R.C.M Chruch, Amaravathi yards,Chenchupet, Tenali,Andhra pradesh 522202';
-  const hours = settings?.contact?.hours || '10:30 AM - 09:30 PM Daily';
+  const hours = settings?.contact?.hours || '10:00 AM - 09:00 PM Daily';
 
   // Hero Banners
   const defaultBanners = [

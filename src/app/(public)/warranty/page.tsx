@@ -60,8 +60,16 @@ export default async function WarrantyPolicyPage() {
         {/* Content body */}
         <div className="space-y-6 text-sm text-tcf-dark/80 dark:text-tcf-light/85 leading-relaxed font-light">
           <p>
-            At Tenali Central Furniture (TCF), we take pride in crafting premium-quality solid wood furniture designed to last for generations. We stand behind our workmanship with comprehensive warranty policies to give you complete peace of mind.
+            At Tenali Central Furniture (TCF), we take pride in crafting premium-quality solid wood furniture designed to offer lasting comfort and durability. We stand behind our workmanship with comprehensive warranty policies to give you complete peace of mind.
           </p>
+
+          {/* Mandatory Bill Note */}
+          <div className="p-4 bg-red-50/45 dark:bg-red-950/10 border-l-4 border-tcf-red text-tcf-dark dark:text-tcf-light rounded-r-xl space-y-1">
+            <p className="font-bold text-xs uppercase tracking-wider text-tcf-red">Important Notice</p>
+            <p className="text-xs font-medium">
+              The original purchase invoice/bill is strictly mandatory to validate, initiate, or claim any warranty services.
+            </p>
+          </div>
 
           {/* Warranty Duration Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
@@ -70,15 +78,15 @@ export default async function WarrantyPolicyPage() {
                 1-Year Manufacturing Warranty
               </h4>
               <p className="text-xs sm:text-sm font-light">
-                Covers any defects in materials, joinery, structural integrity, mechanisms, and upholstery foam.
+                Covers any manufacturing defects in timber materials, structural integrity, joint separations, and functional hardware.
               </p>
             </div>
-            <div className="p-5 bg-red-50/30 dark:bg-red-950/10 border border-tcf-sand dark:border-zinc-800 rounded-xl space-y-2">
-              <h4 className="font-serif font-bold text-base text-tcf-red dark:text-tcf-gold">
-                Lifetime Termite & Borer Warranty
+            <div className="p-5 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-200 dark:border-amber-900/50 rounded-xl space-y-2">
+              <h4 className="font-serif font-bold text-base text-amber-800 dark:text-amber-400">
+                1-Year Sofa Service Warranty
               </h4>
               <p className="text-xs sm:text-sm font-light">
-                Our solid teak wood is fully seasoned and chemically treated to guarantee unmatched protection against termites and borers for life.
+                Cushion sofas, upholstery padding, and upholstered seating products are covered under a service warranty of up to one (1) year only.
               </p>
             </div>
           </div>
@@ -99,7 +107,7 @@ export default async function WarrantyPolicyPage() {
                 <strong>Hardware & Mechanisms:</strong> Drawer runners, hinges, recliner hardware, pneumatic lifts, and other functional parts.
               </li>
               <li>
-                <strong>Upholstery Foam:</strong> Excessive sagging or flattening of foam exceeding 1.5 inches within the first year.
+                <strong>Upholstery & Foam:</strong> Excessive sagging or flattening of cushion foam exceeding 1.5 inches within the first year (eligible for sofa service warranty up to one year only).
               </li>
             </ul>
           </div>
@@ -156,7 +164,7 @@ export default async function WarrantyPolicyPage() {
           <div className="pt-6 border-t border-tcf-sand dark:border-zinc-800/80 space-y-3">
             <h3 className="font-serif font-bold text-lg text-tcf-dark dark:text-tcf-light">How to File a Claim</h3>
             <p>
-              To file a warranty claim, please contact our support team with your order reference ID, invoice, and description/images of the issue:
+              To file a warranty claim, please contact our support team with your order reference ID, **mandatory purchase invoice/bill**, and description/images of the issue:
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-2 text-xs">
               <a 

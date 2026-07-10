@@ -52,7 +52,6 @@ export const Navbar: React.FC = () => {
   const menuItems = [
     { name: 'Home', path: '/' },
     { name: 'Furniture', path: '/products' },
-    { name: 'Gallery', path: '/gallery' },
     { name: 'About', path: '/about' },
     { name: 'Reels', path: '/reels' },
     { name: 'Contact', path: '/contact' }
@@ -93,12 +92,25 @@ export const Navbar: React.FC = () => {
                 Home
               </Link>
 
-              {/* Categories Sub-Dropdown */}
+              {/* Furniture with Dropdown */}
               <div className="relative group">
-                <span className="text-xs font-bold uppercase tracking-wider text-tcf-dark/80 hover:text-tcf-red transition-all duration-200 flex items-center gap-0.5 cursor-pointer py-1">
-                  Categories <ChevronDown className="w-3.5 h-3.5" />
-                </span>
+                <Link 
+                  href="/products" 
+                  className={`text-xs font-bold uppercase tracking-wider transition-all duration-200 py-1 border-b-2 flex items-center gap-0.5 ${
+                    pathname.startsWith('/products') 
+                      ? 'text-tcf-red border-tcf-red' 
+                      : 'text-tcf-dark/80 hover:text-tcf-red border-transparent'
+                  }`}
+                >
+                  Furniture <ChevronDown className="w-3.5 h-3.5" />
+                </Link>
                 <div className="absolute left-0 mt-2 w-64 bg-white border border-tcf-sand shadow-luxury opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 grid grid-cols-1 p-2 rounded-xl">
+                  <Link 
+                    href="/products"
+                    className="px-4 py-2.5 text-xs hover:bg-tcf-light text-tcf-dark hover:text-tcf-red font-bold rounded-lg transition-colors border-b border-tcf-sand/40"
+                  >
+                    All Furniture
+                  </Link>
                   {categories.map((cat) => (
                     <Link 
                       key={cat.databaseId || cat.slug} 
@@ -111,37 +123,13 @@ export const Navbar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Furniture */}
-              <Link 
-                href="/products" 
-                className={`text-xs font-bold uppercase tracking-wider transition-all duration-200 py-1 border-b-2 ${
-                  pathname.startsWith('/products') 
-                    ? 'text-tcf-red border-tcf-red' 
-                    : 'text-tcf-dark/80 hover:text-tcf-red border-transparent'
-                }`}
-              >
-                Furniture
-              </Link>
-
-              {/* Gallery */}
-              <Link 
-                href="/gallery" 
-                className={`text-xs font-bold uppercase tracking-wider transition-all duration-200 py-1 border-b-2 ${
-                  pathname.startsWith('/gallery') 
-                    ? 'text-tcf-red border-tcf-red' 
-                    : 'text-tcf-dark/80 hover:text-tcf-red border-transparent'
-                }`}
-              >
-                Gallery
-              </Link>
-
               {/* Reels */}
               <Link 
                 href="/reels" 
-                className={`text-[11px] font-bold uppercase tracking-[0.15em] transition-colors py-2 ${
+                className={`text-xs font-bold uppercase tracking-wider transition-all duration-200 py-1 border-b-2 ${
                   pathname.startsWith('/reels') 
-                    ? 'text-tcf-red border-b-2 border-tcf-red' 
-                    : 'text-tcf-dark hover:text-tcf-red'
+                    ? 'text-tcf-red border-tcf-red' 
+                    : 'text-tcf-dark/80 hover:text-tcf-red border-transparent'
                 }`}
               >
                 Reels

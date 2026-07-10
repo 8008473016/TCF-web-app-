@@ -35,7 +35,7 @@ const WhatsappIcon = ({ className }: { className?: string }) => (
 export const Footer: React.FC = () => {
   const { settings } = useProductStore();
 
-  const businessHours = settings?.contact?.hours || '09:00 AM - 09:00 PM Daily';
+  const businessHours = settings?.contact?.hours || '10:00 AM - 09:00 PM Daily';
   const contactAddress = settings?.contact?.address || 'Opp R.C.M Chruch, Amaravathi yards,Chenchupet, Tenali,Andhra pradesh 522202';
   const contactPhone = settings?.contact?.phone || '+91 89195 46858';
   const contactEmail = settings?.contact?.email || 'contact@tenalicentralfurniture.com';
@@ -132,9 +132,6 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link href="/custom-furniture" className="hover:text-tcf-red transition-colors">Custom Designs</Link>
-              </li>
-              <li>
-                <Link href="/gallery" className="hover:text-tcf-red transition-colors">Gallery</Link>
               </li>
               <li>
                 <Link href="/reels" className="hover:text-tcf-red transition-colors">Reels</Link>

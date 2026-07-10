@@ -2923,7 +2923,7 @@ export const AdminDashboardClient: React.FC = () => {
                       <input 
                         type="text" 
                         required
-                        value={cmsSettings.contact?.hours || '09:00 AM - 09:00 PM Daily'}
+                        value={cmsSettings.contact?.hours || '10:00 AM - 09:00 PM Daily'}
                         onChange={(e) => setCmsSettings({
                           ...cmsSettings,
                           contact: { ...cmsSettings.contact, hours: e.target.value }
