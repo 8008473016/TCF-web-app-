@@ -1956,7 +1956,7 @@ export const AdminDashboardClient: React.FC = () => {
                           <label className="relative inline-flex items-center cursor-pointer select-none">
                             <input 
                               type="checkbox" 
-                              checked={cmsSettings.reelsEnabled !== false} 
+                              checked={cmsSettings.reelsEnabled !== false && cmsSettings.reelsEnabled !== 'false'} 
                               onChange={(e) => setCmsSettings({ ...cmsSettings, reelsEnabled: e.target.checked })}
                               className="sr-only peer"
                             />
@@ -1972,8 +1972,8 @@ export const AdminDashboardClient: React.FC = () => {
                           <label className="relative inline-flex items-center cursor-pointer select-none">
                             <input 
                               type="checkbox" 
-                              checked={!!cmsSettings.reelsAsHero} 
-                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsSlide}
+                              checked={cmsSettings.reelsAsHero === true || cmsSettings.reelsAsHero === 'true'} 
+                              disabled={cmsSettings.reelsEnabled === false || cmsSettings.reelsEnabled === 'false' || cmsSettings.reelsAsSlide === true || cmsSettings.reelsAsSlide === 'true'}
                               onChange={(e) => setCmsSettings({ ...cmsSettings, reelsAsHero: e.target.checked })}
                               className="sr-only peer disabled:opacity-50"
                             />
@@ -1989,8 +1989,8 @@ export const AdminDashboardClient: React.FC = () => {
                           <label className="relative inline-flex items-center cursor-pointer select-none">
                             <input 
                               type="checkbox" 
-                              checked={!!cmsSettings.reelsAsSlide} 
-                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsHero}
+                              checked={cmsSettings.reelsAsSlide === true || cmsSettings.reelsAsSlide === 'true'} 
+                              disabled={cmsSettings.reelsEnabled === false || cmsSettings.reelsEnabled === 'false' || cmsSettings.reelsAsHero === true || cmsSettings.reelsAsHero === 'true'}
                               onChange={(e) => setCmsSettings({ ...cmsSettings, reelsAsSlide: e.target.checked })}
                               className="sr-only peer disabled:opacity-50"
                             />
@@ -2006,8 +2006,8 @@ export const AdminDashboardClient: React.FC = () => {
                           <label className="relative inline-flex items-center cursor-pointer select-none">
                             <input 
                               type="checkbox" 
-                              checked={cmsSettings.reelsGridMode !== false} 
-                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsHero}
+                              checked={cmsSettings.reelsGridMode !== false && cmsSettings.reelsGridMode !== 'false'} 
+                              disabled={cmsSettings.reelsEnabled === false || cmsSettings.reelsEnabled === 'false' || cmsSettings.reelsAsHero === true || cmsSettings.reelsAsHero === 'true'}
                               onChange={(e) => setCmsSettings({ ...cmsSettings, reelsGridMode: e.target.checked })}
                               className="sr-only peer disabled:opacity-50"
                             />

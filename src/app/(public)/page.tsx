@@ -221,13 +221,13 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      {settings?.reelsEnabled !== false && settings?.reelsAsHero && (settings?.reels || []).length > 0 ? (
+      {(settings?.reelsEnabled !== false && settings?.reelsEnabled !== 'false') && (settings?.reelsAsHero === true || settings?.reelsAsHero === 'true') && (settings?.reels || []).length > 0 ? (
         <ReelsGrid reels={settings.reels} isHero />
       ) : (
         <HeroSlider 
           banners={banners} 
           reels={settings?.reels || []} 
-          reelsAsSlide={settings?.reelsEnabled !== false && !!settings?.reelsAsSlide} 
+          reelsAsSlide={(settings?.reelsEnabled !== false && settings?.reelsEnabled !== 'false') && (settings?.reelsAsSlide === true || settings?.reelsAsSlide === 'true')} 
         />
       )}
 
@@ -501,8 +501,8 @@ export default async function HomePage() {
       </div> {/* Close relative z-10 scrollable wrapper (Part 1 - Above Reels) */}
 
       {/* Instagram Reels Grid (Bottom Section / Parallax Footer Reveal) */}
-      {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
-        settings?.reelsGridMode !== false ? (
+      {(settings?.reelsEnabled !== false && settings?.reelsEnabled !== 'false') && !(settings?.reelsAsHero === true || settings?.reelsAsHero === 'true') && (settings?.reels || []).length > 0 && (
+        (settings?.reelsGridMode !== false && settings?.reelsGridMode !== 'false') ? (
           <div className="relative z-10 w-full bg-tcf-light">
             <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
           </div>
