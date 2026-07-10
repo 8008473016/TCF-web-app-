@@ -1,6 +1,14 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Instagram, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
+
+const InstagramIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+  </svg>
+);
 
 interface ReelItem {
   id: string;
@@ -64,7 +72,7 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
       {/* Centered Instagram Content Overlay */}
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none px-4">
         <div className="p-3 bg-white/15 backdrop-blur-md border border-white/20 rounded-full mb-3 animate-pulse">
-          <Instagram className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+          <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
         </div>
         <h2 className="text-white text-xl sm:text-2xl font-serif font-black tracking-wider uppercase drop-shadow-md">
           Check Our Latest Reels
