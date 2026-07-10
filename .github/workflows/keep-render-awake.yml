@@ -1,0 +1,18 @@
+name: Keep Render Awake
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+
+  workflow_dispatch:
+
+jobs:
+  ping-website:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Ping website
+        run: |
+          curl --fail --location --retry 3 --max-time 120 \
+            --user-agent "GitHub-Actions-Keep-Alive" \
+            https://tenalicentralfurnitures.com/
