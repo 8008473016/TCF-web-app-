@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import { HeroSlider } from '@/components/sections/HeroSlider';
-import { ReelsGrid } from '@/components/sections/ReelsGrid';
+import { ReelsGrid, InstagramIcon } from '@/components/sections/ReelsGrid';
 import { ScrollRevealObserver } from '@/components/ScrollRevealObserver';
 import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
@@ -477,14 +477,39 @@ export default async function HomePage() {
             <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
           </div>
         ) : (
-          <>
-            {/* Transparent spacer in scrollable flow */}
-            <div className="w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] bg-transparent pointer-events-none" />
-            {/* Stable fixed viewport-locked layer underneath */}
-            <div className="fixed bottom-0 left-0 w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] z-0 bg-black">
+          <section 
+            className="relative w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] overflow-hidden bg-black z-10"
+            style={{ clipPath: 'inset(0)' }}
+          >
+            {/* Stable fixed viewport-locked layer underneath (visible through the clipped parent window) */}
+            <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
               <ReelsGrid reels={settings.reels} limit={5} parallax />
             </div>
-          </>
+
+            {/* Black Shade Overlay */}
+            <div className="absolute inset-0 bg-black/45 pointer-events-none z-10" />
+
+            {/* Centered Instagram Content Overlay */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center z-20 pointer-events-none px-4">
+              <div className="p-3 bg-white/15 backdrop-blur-md border border-white/20 rounded-full mb-3 animate-pulse">
+                <InstagramIcon className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
+              </div>
+              <h2 className="text-white text-xl sm:text-2xl font-serif font-black tracking-wider uppercase drop-shadow-md">
+                Check Our Latest Reels
+              </h2>
+              <p className="text-white/80 text-xs sm:text-sm mt-1.5 drop-shadow-sm font-medium">
+                Follow us on Instagram{' '}
+                <a 
+                  href="https://www.instagram.com/tenali_centralfurnitures/" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="underline hover:text-[#DE2943] pointer-events-auto transition-colors font-bold"
+                >
+                  @tenali_centralfurnitures
+                </a>
+              </p>
+            </div>
+          </section>
         )
       )}
 
