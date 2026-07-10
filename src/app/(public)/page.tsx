@@ -10,13 +10,41 @@ import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: "Tenali Central Furniture (TCF) | Premium Wood Furniture in Tenali",
-  description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Custom teak wood beds, cushion sofas, dining tables & more. Best furniture store in Tenali.",
-  keywords: ["Tenali Furniture", "Tenali Furnitures", "Furniture in Tenali", "Furniture Store Tenali", "Teak Wood Furniture Tenali", "Tenali Central Furniture", "Custom Wood Furniture"],
+  title: "Tenali Furniture | Tenali Central Furniture (TCF) | Premium Teak Solid Wood",
+  description: "Looking for premium Tenali furniture? Tenali Central Furniture (TCF) handcrafts premium solid teak wood cots, luxury sofas, and dining tables at direct factory prices in Tenali, AP. Termite warranty included.",
+  keywords: [
+    "Tenali Furniture",
+    "Furniture in Tenali",
+    "Tenali Central Furniture",
+    "Tenali Furnitures",
+    "TCF Tenali",
+    "Furniture Store in Tenali",
+    "Teak Wood Furniture Tenali",
+    "Tenali Bed Shop",
+    "Tenali Sofa Shop",
+    "Best Furniture Tenali"
+  ],
   openGraph: {
-    title: "Tenali Central Furniture (TCF) | Tenali Furniture",
-    description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations.",
-    images: ["https://tenalicentralfurnitures.com/cover-photo.jpeg"],
+    title: "Tenali Furniture | Tenali Central Furniture (TCF)",
+    description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations at factory-direct prices.",
+    url: "https://www.tenalicentralfurnitures.com",
+    siteName: "Tenali Central Furniture",
+    images: [
+      {
+        url: "https://www.tenalicentralfurnitures.com/cover-photo.jpeg",
+        width: 1200,
+        height: 630,
+        alt: "Tenali Central Furniture Cover Photo"
+      }
+    ],
+    locale: "en_US",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tenali Furniture | Tenali Central Furniture (TCF)",
+    description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations at factory-direct prices.",
+    images: ["https://www.tenalicentralfurnitures.com/cover-photo.jpeg"]
   }
 };
 
@@ -149,6 +177,8 @@ export default async function HomePage() {
 
   return (
     <div className="flex-1 flex flex-col font-sans w-full">
+      {/* Screen Reader Only Header for Google SEO Rankings */}
+      <h1 className="sr-only">Tenali Furniture - Tenali Central Furniture (TCF)</h1>
       {/* Scrollable sections wrapper */}
       <div className="bg-tcf-light flex-1 flex flex-col space-y-16 pb-12 w-full relative z-10">
         <ScrollRevealObserver />
@@ -161,9 +191,9 @@ export default async function HomePage() {
             "@context": "https://schema.org",
             "@type": "FurnitureStore",
             "name": "Tenali Central Furniture (TCF)",
-            "image": "https://tenalicentralfurnitures.com/cover-photo.jpeg",
-            "@id": "https://tenalicentralfurnitures.com",
-            "url": "https://tenalicentralfurniture.com",
+            "image": "https://www.tenalicentralfurnitures.com/cover-photo.jpeg",
+            "@id": "https://www.tenalicentralfurnitures.com",
+            "url": "https://www.tenalicentralfurnitures.com",
             "telephone": phone,
             "address": {
               "@type": "PostalAddress",

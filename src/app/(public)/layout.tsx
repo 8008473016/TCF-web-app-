@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tenali Central Furniture (TCF) | Tenali Furniture",
     description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations.",
-    images: ["https://tenalicentralfurnitures.com/cover-photo.jpeg"],
+    images: ["https://www.tenalicentralfurnitures.com/cover-photo.jpeg"],
   }
 };
 

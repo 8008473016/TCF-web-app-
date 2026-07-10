@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://tenalicentralfurniture.com';
+  const baseUrl = 'https://www.tenalicentralfurnitures.com';
 
   // Base core pages
   const staticPages = [
