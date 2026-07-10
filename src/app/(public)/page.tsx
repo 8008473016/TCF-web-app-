@@ -509,10 +509,9 @@ export default async function HomePage() {
         ) : (
           <section 
             className="relative w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] overflow-hidden bg-black z-10"
-            style={{ clipPath: 'inset(0)' }}
           >
-            {/* Stable fixed viewport-locked layer underneath (visible through the clipped parent window) */}
-            <div className="fixed inset-0 w-full h-full z-0 pointer-events-auto">
+            {/* Stable viewport-locked layer underneath (rendered absolute, animated via internal scroll listener) */}
+            <div className="absolute inset-0 w-full h-full z-0 pointer-events-auto">
               <ReelsGrid reels={settings.reels} limit={5} parallax />
             </div>
 

@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Play } from 'lucide-react';
 
 export const InstagramIcon = ({ className }: { className?: string }) => (
@@ -24,6 +24,35 @@ interface ReelsGridProps {
 }
 
 export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, limit = 15, parallax = false }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [translateY, setTranslateY] = useState(0);
+
+  useEffect(() => {
+    if (!parallax) return;
+
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const parent = containerRef.current.parentElement;
+      if (!parent) return;
+
+      const rect = parent.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate scroll offset based on elements relative position in viewport
+      const offset = (rect.top + rect.height / 2 - viewportHeight / 2) * -0.25;
+      setTranslateY(offset);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    handleScroll();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
+    };
+  }, [parallax]);
+
   // If parallax mode is ON, we show exactly 5 reels on the screen at a time
   const slotCount = isHero ? 5 : (parallax ? 5 : Math.min(limit, reels.length));
   const [slots, setSlots] = useState<ReelItem[]>([]);
@@ -70,13 +99,23 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false, lim
     );
   }
 
-  // Parallax Mode: Completely stable viewport-locked background grid (fills fixed container)
+  // Parallax Mode: Smooth scroll-driven translation grid (fills parent with extra height to prevent gaps)
   if (parallax) {
     return (
-      <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-0 bg-black">
-        {slots.map((reel, idx) => (
-          <ReelSlot key={idx} reel={reel} isHero={false} />
-        ))}
+      <div 
+        ref={containerRef}
+        className="absolute inset-x-0 w-full z-0 transition-transform duration-75 ease-out"
+        style={{ 
+          top: '-30%', 
+          height: '160%',
+          transform: `translateY(${translateY}px)`
+        }}
+      >
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-0 bg-black h-full w-full">
+          {slots.map((reel, idx) => (
+            <ReelSlot key={idx} reel={reel} isHero={false} />
+          ))}
+        </div>
       </div>
     );
   }
