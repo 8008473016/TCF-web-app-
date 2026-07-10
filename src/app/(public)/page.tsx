@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { db } from '@/lib/db';
 import { HeroSlider } from '@/components/sections/HeroSlider';
 import { ReelsGrid } from '@/components/sections/ReelsGrid';
+import { ScrollRevealObserver } from '@/components/ScrollRevealObserver';
 import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
 
@@ -145,6 +146,7 @@ export default async function HomePage() {
     <div className="flex-1 flex flex-col font-sans w-full">
       {/* Scrollable sections wrapper */}
       <div className="bg-tcf-light flex-1 flex flex-col space-y-16 pb-12 w-full relative z-10">
+        <ScrollRevealObserver />
       
       {/* Local Business JSON-LD Schema */}
       <script
@@ -204,7 +206,7 @@ export default async function HomePage() {
           : categories.slice(0, 8);
 
         return (
-          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full">
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full reveal-on-scroll">
             <div className="text-center space-y-2">
               <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Exquisite Designs</span>
               <h2 className="text-3xl sm:text-4xl font-serif font-black text-tcf-dark">Shop By Category</h2>
@@ -240,7 +242,7 @@ export default async function HomePage() {
       })()}
 
       {/* Signature Bestsellers */}
-      <section className="bg-white border-y border-tcf-sand/80 py-16 w-full">
+      <section className="bg-white border-y border-tcf-sand/80 py-16 w-full reveal-fade">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 w-full">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-2">
@@ -271,7 +273,7 @@ export default async function HomePage() {
       </section>
 
       {/* Custom Furniture Banner CTA */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full reveal-on-scroll">
         <div className="bg-tcf-dark text-white grid grid-cols-1 lg:grid-cols-2 border border-tcf-sand shadow-luxury rounded-3xl overflow-hidden">
           <div className="relative p-8 sm:p-16 flex flex-col justify-center space-y-6 overflow-hidden">
             <div className="relative z-10 flex flex-col space-y-6">
@@ -320,7 +322,7 @@ export default async function HomePage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="bg-zinc-50 border-y border-tcf-sand/80 py-10 w-full">
+      <section className="bg-zinc-50 border-y border-tcf-sand/80 py-10 w-full reveal-fade">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {trustSignals.map((signal, index) => (
@@ -344,7 +346,7 @@ export default async function HomePage() {
       </section>
 
       {/* Map & Showroom Contact */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-12 w-full pt-6">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-3 gap-12 w-full pt-6 reveal-on-scroll">
         <div className="space-y-6 flex flex-col justify-center bg-white border border-tcf-sand p-8 rounded-3xl shadow-premium">
           <div>
             <span className="text-tcf-red text-[10px] font-bold uppercase tracking-[0.2em] block mb-1">Visit Our Showroom</span>
@@ -401,7 +403,7 @@ export default async function HomePage() {
       </section>
 
       {/* Testimonials Review Section */}
-      <section className="relative py-20 overflow-hidden bg-zinc-50 border-t border-tcf-sand w-full">
+      <section className="relative py-20 overflow-hidden bg-zinc-50 border-t border-tcf-sand w-full reveal-fade">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10 w-full">
           <div className="text-center space-y-2">
             <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Verified Reviews</span>
