@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import { HeroSlider } from '@/components/sections/HeroSlider';
+import { ReelsGrid } from '@/components/sections/ReelsGrid';
 import { ProductCard } from '@/components/ProductCard';
 import { RotateCcw, Hammer, Sparkles, ArrowRight, Star, Plus, Check } from 'lucide-react';
 
@@ -181,7 +182,11 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      <HeroSlider banners={banners} />
+      {settings?.reelsEnabled !== false && settings?.reelsAsHero && (settings?.reels || []).length > 0 ? (
+        <ReelsGrid reels={settings.reels} isHero />
+      ) : (
+        <HeroSlider banners={banners} />
+      )}
 
       {/* Categories Grid */}
       {(() => {
@@ -450,6 +455,11 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* Instagram Reels Grid (Bottom Section) */}
+      {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
+        <ReelsGrid reels={settings.reels} />
+      )}
 
     </div>
   );

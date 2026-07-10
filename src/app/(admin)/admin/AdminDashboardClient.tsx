@@ -41,7 +41,7 @@ type SubTab =
 
 type ProductTab = 'general' | 'seo' | 'gallery' | 'specifications' | 'related' | 'visibility' | 'analytics' | 'preview';
 
-type HomepageSection = 'hero' | 'categories' | 'why-us' | 'bestsellers' | 'featured' | 'gallery' | 'testimonials' | 'faq' | 'footer';
+type HomepageSection = 'hero' | 'categories' | 'why-us' | 'bestsellers' | 'featured' | 'reels' | 'gallery' | 'testimonials' | 'faq' | 'footer';
 
 export const AdminDashboardClient: React.FC = () => {
   const { isAuthenticated, logout } = useAuthStore();
@@ -104,7 +104,7 @@ export const AdminDashboardClient: React.FC = () => {
 
   // Media Library Dialog Selector (Wordpress-style picker)
   const [isMediaPickerOpen, setIsMediaPickerOpen] = useState(false);
-  const [mediaPickerTarget, setMediaPickerTarget] = useState<'product-gallery' | 'cms-banner' | 'media-replace' | 'category-banner' | null>(null);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'product-gallery' | 'cms-banner' | 'media-replace' | 'category-banner' | 'reel-video' | null>(null);
   const [bannerPickerIndex, setBannerPickerIndex] = useState<number | null>(null);
 
   // Media CRUD state
@@ -601,6 +601,9 @@ export const AdminDashboardClient: React.FC = () => {
         ...categoryForm,
         banner: url
       });
+    } else if (mediaPickerTarget === 'reel-video') {
+      const vInput = document.getElementById('new-reel-video-url') as HTMLInputElement;
+      if (vInput) vInput.value = url;
     }
     setIsMediaPickerOpen(false);
     setMediaPickerTarget(null);
@@ -1302,7 +1305,7 @@ export const AdminDashboardClient: React.FC = () => {
 
                   {/* Section Selector Subbar */}
                   <div className="flex gap-1.5 flex-wrap border-b border-gray-200 pb-2">
-                    {(['hero', 'categories', 'why-us', 'bestsellers', 'featured', 'gallery', 'testimonials', 'faq', 'footer'] as HomepageSection[]).map(sect => (
+                    {(['hero', 'categories', 'why-us', 'bestsellers', 'featured', 'reels', 'gallery', 'testimonials', 'faq', 'footer'] as HomepageSection[]).map(sect => (
                       <button
                         key={sect}
                         type="button"
@@ -1922,6 +1925,188 @@ export const AdminDashboardClient: React.FC = () => {
                               <p className="text-[11px] text-gray-500 leading-relaxed truncate">{c.description}</p>
                             </div>
                           ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeHomeSection === 'reels' && cmsSettings && (
+                    <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm space-y-6">
+                      <div className="flex justify-between items-center pb-4 border-b border-gray-100">
+                        <div>
+                          <h2 className="text-xl font-serif font-bold text-[#121110]">Instagram Reels Settings</h2>
+                          <p className="text-xs text-gray-500">Manage your homepage video grid and Reels page.</p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={handleSaveCmsSettings}
+                          className="px-4 py-2 bg-[#DE2943] text-white hover:bg-red-750 font-bold text-xs uppercase tracking-wider rounded-lg flex items-center gap-1.5"
+                        >
+                          <Save className="w-4 h-4" /> Save Changes
+                        </button>
+                      </div>
+
+                      {/* Toggles */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-gray-50 p-4 border border-gray-200 rounded-xl">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-[#121110] block">Show Reels Section</span>
+                            <span className="text-[10px] text-gray-500">Display this section on your homepage</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer select-none">
+                            <input 
+                              type="checkbox" 
+                              checked={cmsSettings.reelsEnabled !== false} 
+                              onChange={(e) => setCmsSettings({ ...cmsSettings, reelsEnabled: e.target.checked })}
+                              className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DE2943]"></div>
+                          </label>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-[#121110] block">Set as Hero Section</span>
+                            <span className="text-[10px] text-gray-500">Move Reels grid to top fold (replacing Hero Slider)</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer select-none">
+                            <input 
+                              type="checkbox" 
+                              checked={!!cmsSettings.reelsAsHero} 
+                              disabled={cmsSettings.reelsEnabled === false}
+                              onChange={(e) => setCmsSettings({ ...cmsSettings, reelsAsHero: e.target.checked })}
+                              className="sr-only peer disabled:opacity-50"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DE2943] peer-disabled:opacity-50"></div>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Video Adder */}
+                      <div className="p-4 border border-gray-200 rounded-xl space-y-4">
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Add New Reel Video</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold uppercase text-gray-500">Cloudinary Video URL (.mp4)</label>
+                            <div className="flex gap-2">
+                              <input 
+                                type="text"
+                                id="new-reel-video-url"
+                                placeholder="https://res.cloudinary.com/.../video.mp4"
+                                className="flex-1 px-3 py-1.5 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setMediaPickerTarget('reel-video');
+                                  setIsMediaPickerOpen(true);
+                                }}
+                                className="px-3 py-1.5 bg-gray-800 text-white font-bold text-[10px] uppercase rounded-lg hover:bg-gray-700"
+                              >
+                                Select
+                              </button>
+                            </div>
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[9px] font-bold uppercase text-gray-500">Instagram Post Link (Optional)</label>
+                            <input 
+                              type="text"
+                              id="new-reel-insta-url"
+                              placeholder="https://www.instagram.com/reel/..."
+                              className="w-full px-3 py-1.5 border border-gray-300 bg-white text-xs rounded-lg text-[#121110]"
+                            />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const vInput = document.getElementById('new-reel-video-url') as HTMLInputElement;
+                            const iInput = document.getElementById('new-reel-insta-url') as HTMLInputElement;
+                            if (!vInput || !vInput.value.trim()) return alert('Video URL is required.');
+                            
+                            const newReel = {
+                              id: `reel_${Date.now()}`,
+                              videoUrl: vInput.value.trim(),
+                              instagramUrl: iInput?.value.trim() || ''
+                            };
+                            
+                            const list = [...(cmsSettings.reels || []), newReel];
+                            setCmsSettings({ ...cmsSettings, reels: list });
+                            vInput.value = '';
+                            if (iInput) iInput.value = '';
+                          }}
+                          className="px-4 py-2 bg-gray-800 text-white font-bold text-xs uppercase rounded-lg hover:bg-gray-700"
+                        >
+                          Add Reel to Pool
+                        </button>
+                      </div>
+
+                      {/* Video List */}
+                      <div className="space-y-3">
+                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Managed Reels ({ (cmsSettings.reels || []).length } videos)</span>
+                        <div className="grid grid-cols-1 gap-2">
+                          {(cmsSettings.reels || []).map((reel: any, index: number) => (
+                            <div key={reel.id || index} className="flex items-center justify-between p-3 border border-gray-200 rounded-xl bg-gray-50">
+                              <div className="flex items-center gap-3 min-w-0 flex-1">
+                                <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200 bg-black flex items-center justify-center flex-shrink-0">
+                                  <video src={reel.videoUrl} className="w-full h-full object-cover" muted />
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-xs font-bold text-[#121110] truncate">{reel.videoUrl}</p>
+                                  {reel.instagramUrl && (
+                                    <span className="text-[10px] text-purple-600 block truncate">{reel.instagramUrl}</span>
+                                  )}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-1 flex-shrink-0">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (index === 0) return;
+                                    const list = [...cmsSettings.reels];
+                                    const temp = list[index - 1];
+                                    list[index - 1] = list[index];
+                                    list[index] = temp;
+                                    setCmsSettings({ ...cmsSettings, reels: list });
+                                  }}
+                                  disabled={index === 0}
+                                  className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"
+                                >
+                                  <ArrowUp className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (index === cmsSettings.reels.length - 1) return;
+                                    const list = [...cmsSettings.reels];
+                                    const temp = list[index + 1];
+                                    list[index + 1] = list[index];
+                                    list[index] = temp;
+                                    setCmsSettings({ ...cmsSettings, reels: list });
+                                  }}
+                                  disabled={index === cmsSettings.reels.length - 1}
+                                  className="p-1 text-gray-400 hover:text-gray-700 disabled:opacity-30"
+                                >
+                                  <ArrowDown className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const list = cmsSettings.reels.filter((r: any) => r.id !== reel.id);
+                                    setCmsSettings({ ...cmsSettings, reels: list });
+                                  }}
+                                  className="p-1 text-red-500 hover:text-red-700 ml-1"
+                                >
+                                  <Trash className="w-4 h-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                          {(cmsSettings.reels || []).length === 0 && (
+                            <p className="text-xs text-gray-500 text-center py-6 bg-gray-50 border border-dashed border-gray-200 rounded-xl">
+                              No reels added yet. Upload video files (.mp4) to Cloudinary and add them here to start displaying them on the site.
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
