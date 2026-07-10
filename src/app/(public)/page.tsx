@@ -461,47 +461,25 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
-
       </div> {/* Close relative z-10 scrollable wrapper (Part 1 - Above Reels) */}
 
-      {/* Instagram Reels Grid (Middle Section) */}
+      {/* Instagram Reels Grid (Bottom Section / Parallax Footer Reveal) */}
       {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
-        <div className="relative z-10 w-full bg-tcf-light">
-          <ReelsGrid 
-            reels={settings.reels} 
-            limit={settings.reelsCount || 15} 
-            parallax={settings?.reelsGridMode === false} 
-          />
-        </div>
+        settings?.reelsGridMode !== false ? (
+          <div className="relative z-10 w-full bg-tcf-light">
+            <ReelsGrid reels={settings.reels} limit={settings.reelsCount || 15} />
+          </div>
+        ) : (
+          <>
+            {/* Transparent spacer in scrollable flow */}
+            <div className="w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] bg-transparent pointer-events-none" />
+            {/* Stable fixed viewport-locked layer underneath */}
+            <div className="fixed bottom-0 left-0 w-full aspect-[2/1] sm:aspect-[3/1] md:aspect-[5/1] z-0 bg-black">
+              <ReelsGrid reels={settings.reels} limit={5} parallax />
+            </div>
+          </>
+        )
       )}
-
-      {/* Scrollable sections wrapper (Part 2 - Below Reels: FAQs) */}
-      <div className="bg-tcf-light flex flex-col space-y-16 py-16 w-full relative z-10">
-        {/* FAQs Section */}
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 w-full py-6">
-          <div className="text-center space-y-2">
-            <span className="text-tcf-red text-xs font-bold uppercase tracking-[0.2em]">Got Questions?</span>
-            <h2 className="text-3xl sm:text-4xl font-serif font-black text-tcf-dark">Frequently Asked Questions</h2>
-            <div className="w-16 h-0.5 bg-tcf-red mx-auto mt-4" />
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq: any, index: number) => (
-              <div 
-                key={index}
-                className="bg-white border border-tcf-sand p-6 rounded-2xl shadow-sm"
-              >
-                <h3 className="font-serif font-bold text-sm text-tcf-dark mb-2">
-                  Q: {faq.question}
-                </h3>
-                <p className="text-xs text-tcf-dark/70 leading-relaxed font-light">
-                  A: {faq.answer}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
 
     </div>
   );
