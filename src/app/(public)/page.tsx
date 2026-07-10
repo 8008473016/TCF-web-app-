@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     "Tenali Sofa Shop",
     "Best Furniture Tenali"
   ],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "Tenali Furniture | Tenali Central Furniture (TCF)",
     description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations at factory-direct prices.",

@@ -12,6 +12,11 @@ export const metadata: Metadata = {
   title: "Tenali Central Furniture (TCF) | Premium Wood Furniture in Tenali",
   description: "Experience premium solid wood furniture handcrafted in Tenali, Andhra Pradesh. Custom teak wood beds, cushion sofas, dining tables & more. Best furniture store in Tenali.",
   keywords: ["Tenali Furniture", "Tenali Furnitures", "Furniture in Tenali", "Furniture Store Tenali", "Teak Wood Furniture Tenali", "Tenali Central Furniture", "Custom Wood Furniture"],
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "Tenali Central Furniture (TCF) | Tenali Furniture",
     description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations.",
