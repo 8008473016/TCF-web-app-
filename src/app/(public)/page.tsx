@@ -142,7 +142,9 @@ export default async function HomePage() {
   const faqs = settings?.faqs || defaultFaqs;
 
   return (
-    <div className="bg-tcf-light flex-1 flex flex-col font-sans space-y-16 pb-12 w-full">
+    <div className="flex-1 flex flex-col font-sans w-full">
+      {/* Scrollable sections wrapper */}
+      <div className="bg-tcf-light flex-1 flex flex-col space-y-16 pb-12 w-full relative z-10">
       
       {/* Local Business JSON-LD Schema */}
       <script
@@ -185,7 +187,11 @@ export default async function HomePage() {
       {settings?.reelsEnabled !== false && settings?.reelsAsHero && (settings?.reels || []).length > 0 ? (
         <ReelsGrid reels={settings.reels} isHero />
       ) : (
-        <HeroSlider banners={banners} />
+        <HeroSlider 
+          banners={banners} 
+          reels={settings?.reels || []} 
+          reelsAsSlide={settings?.reelsEnabled !== false && !!settings?.reelsAsSlide} 
+        />
       )}
 
       {/* Categories Grid */}
@@ -456,9 +462,19 @@ export default async function HomePage() {
         </div>
       </section>
 
+      </div> {/* Close relative z-10 scrollable wrapper */}
+
       {/* Instagram Reels Grid (Bottom Section) */}
       {settings?.reelsEnabled !== false && !settings?.reelsAsHero && (settings?.reels || []).length > 0 && (
-        <ReelsGrid reels={settings.reels} />
+        settings?.reelsGridMode !== false ? (
+          <ReelsGrid reels={settings.reels} />
+        ) : (
+          <div className="relative h-[300px] sm:h-[450px] w-full overflow-hidden" style={{ clipPath: 'inset(0)' }}>
+            <div className="fixed inset-0 w-full h-full z-0">
+              <ReelsGrid reels={settings.reels} />
+            </div>
+          </div>
+        )
       )}
 
     </div>

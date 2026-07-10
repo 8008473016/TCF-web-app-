@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 import { openQuoteModal } from '../layout/QuoteRequestDialog';
+import { ReelsGrid } from './ReelsGrid';
 
 interface Banner {
   id: string;
@@ -12,36 +13,59 @@ interface Banner {
   subtitle: string;
   ctaText: string;
   ctaLink: string;
+  isReels?: boolean;
 }
 
 interface HeroSliderProps {
   banners: Banner[];
+  reels?: any[];
+  reelsAsSlide?: boolean;
 }
 
-export const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
+export const HeroSlider: React.FC<HeroSliderProps> = ({ banners, reels = [], reelsAsSlide = false }) => {
   const [activeBanner, setActiveBanner] = useState(0);
+  const [slides, setSlides] = useState<any[]>(banners);
 
   useEffect(() => {
-    if (banners.length <= 1) return;
+    if (reelsAsSlide && reels.length > 0) {
+      setSlides([
+        ...banners,
+        {
+          id: 'reels-slide',
+          isReels: true,
+          title: 'Check Our Latest Reels',
+          subtitle: 'Watch our latest furniture designs and custom creations in action.',
+          ctaText: 'Bespoke Inquiry',
+          ctaLink: '#',
+          image: ''
+        }
+      ]);
+    } else {
+      setSlides(banners);
+    }
+  }, [banners, reels, reelsAsSlide]);
+
+  useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
-      setActiveBanner((prev) => (prev + 1) % banners.length);
+      setActiveBanner((prev) => (prev + 1) % slides.length);
     }, 6000);
     return () => clearInterval(timer);
-  }, [banners]);
+  }, [slides]);
 
   const handlePrev = () => {
-    setActiveBanner((prev) => (prev - 1 + banners.length) % banners.length);
+    setActiveBanner((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   const handleNext = () => {
-    setActiveBanner((prev) => (prev + 1) % banners.length);
+    setActiveBanner((prev) => (prev + 1) % slides.length);
   };
 
-  if (!banners || banners.length === 0) return null;
+  if (!slides || slides.length === 0) return null;
 
   return (
     <section className="relative h-[80vh] sm:h-[85vh] bg-tcf-dark overflow-hidden w-full">
-      {banners.map((banner, index) => (
+      {slides.map((banner, index) => (
         <div 
           key={banner.id}
           className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
@@ -51,13 +75,19 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
           {/* Background Overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-tcf-dark/90 via-tcf-dark/60 to-transparent z-10" />
           
-          {/* Image */}
-          <img 
-            src={banner.image} 
-            alt={banner.title} 
-            className="w-full h-full object-cover object-center"
-          />
-
+          {/* Background Content (Image or ReelsGrid) */}
+          {banner.isReels ? (
+            <div className="absolute inset-0 z-0">
+              <ReelsGrid reels={reels} isHero />
+            </div>
+          ) : (
+            <img 
+              src={banner.image} 
+              alt={banner.title} 
+              className="w-full h-full object-cover object-center"
+            />
+          )}
+          
           {/* Content */}
           <div className="absolute inset-0 z-20 flex items-center">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
@@ -72,28 +102,32 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
                   {banner.subtitle}
                 </p>
                 <div className="pt-4 flex flex-wrap gap-4">
-                  {banner.ctaText.toLowerCase().includes('quote') ? (
-                    <button 
-                      onClick={() => openQuoteModal()}
-                      className="px-8 py-3.5 bg-tcf-red text-white hover:bg-tcf-gold hover:text-tcf-dark uppercase text-xs font-bold tracking-widest flex items-center gap-2 transition-all rounded shadow-premium hover:-translate-y-0.5 cursor-pointer"
-                    >
-                      {banner.ctaText} <ArrowRight className="w-4 h-4" />
-                    </button>
-                  ) : (
-                    <Link 
-                      href={banner.ctaLink}
-                      className="px-8 py-3.5 bg-tcf-red text-white hover:bg-tcf-gold hover:text-tcf-dark uppercase text-xs font-bold tracking-widest flex items-center gap-2 transition-all rounded shadow-premium hover:-translate-y-0.5"
-                    >
-                      {banner.ctaText} <ArrowRight className="w-4 h-4" />
-                    </Link>
+                  {banner.ctaText && (
+                    banner.ctaText.toLowerCase().includes('quote') || banner.ctaText.toLowerCase().includes('inquiry') || banner.isReels ? (
+                      <button 
+                        onClick={() => openQuoteModal()}
+                        className="px-8 py-3.5 bg-tcf-red text-white hover:bg-tcf-gold hover:text-tcf-dark uppercase text-xs font-bold tracking-widest flex items-center gap-2 transition-all rounded shadow-premium hover:-translate-y-0.5 cursor-pointer"
+                      >
+                        {banner.ctaText} <ArrowRight className="w-4 h-4" />
+                      </button>
+                    ) : (
+                      <Link 
+                        href={banner.ctaLink}
+                        className="px-8 py-3.5 bg-tcf-red text-white hover:bg-tcf-gold hover:text-tcf-dark uppercase text-xs font-bold tracking-widest flex items-center gap-2 transition-all rounded shadow-premium hover:-translate-y-0.5"
+                      >
+                        {banner.ctaText} <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    )
                   )}
                   
-                  <button 
-                    onClick={() => openQuoteModal()}
-                    className="px-8 py-3.5 border border-white text-white hover:bg-white hover:text-tcf-dark uppercase text-xs font-bold tracking-widest transition-colors rounded"
-                  >
-                    Bespoke Inquiry
-                  </button>
+                  {!banner.isReels && (
+                    <button 
+                      onClick={() => openQuoteModal()}
+                      className="px-8 py-3.5 border border-white text-white hover:bg-white hover:text-tcf-dark uppercase text-xs font-bold tracking-widest transition-colors rounded"
+                    >
+                      Bespoke Inquiry
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -102,7 +136,7 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
       ))}
 
       {/* Navigation Arrows */}
-      {banners.length > 1 && (
+      {slides.length > 1 && (
         <>
           <button
             onClick={handlePrev}
@@ -122,9 +156,9 @@ export const HeroSlider: React.FC<HeroSliderProps> = ({ banners }) => {
       )}
 
       {/* Dots Indicator */}
-      {banners.length > 1 && (
+      {slides.length > 1 && (
         <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 flex gap-2.5">
-          {banners.map((_, i) => (
+          {slides.map((_, i) => (
             <button 
               key={i}
               onClick={() => setActiveBanner(i)}

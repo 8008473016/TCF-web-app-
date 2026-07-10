@@ -31,7 +31,7 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
     }
   }, [reels, slotCount]);
 
-  // Cycle a random slot every 3 seconds
+  // Cycle a random slot every 6 seconds
   useEffect(() => {
     if (reels.length <= slotCount) return;
 
@@ -48,7 +48,7 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
           return next;
         });
       }
-    }, 3000);
+    }, 6000);
 
     return () => clearInterval(interval);
   }, [slots, reels, slotCount]);
@@ -58,7 +58,7 @@ export const ReelsGrid: React.FC<ReelsGridProps> = ({ reels, isHero = false }) =
   // For mobile/tablet we use grid-cols-2 or grid-cols-3, on desktop grid-cols-5. 
   // All elements are zero gap.
   return (
-    <section className={`relative w-full overflow-hidden ${isHero ? 'h-[60vh] sm:h-[80vh]' : 'h-[300px] sm:h-[450px]'} bg-black`}>
+    <section className={`relative w-full overflow-hidden ${isHero ? 'h-[60vh] sm:h-[85vh]' : 'h-[300px] sm:h-[450px]'} bg-black`}>
       {/* Zero Gap Side-by-Side Video Grid */}
       <div className="absolute inset-0 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 h-full w-full">
         {slots.map((reel, idx) => (
@@ -117,7 +117,7 @@ const ReelSlot: React.FC<{ reel: ReelItem }> = ({ reel }) => {
       className="relative block w-full h-full overflow-hidden cursor-pointer group"
     >
       <video
-        src={currentReel.videoUrl}
+        src={currentReel.videoUrl + '#t=2'}
         autoPlay
         muted
         loop

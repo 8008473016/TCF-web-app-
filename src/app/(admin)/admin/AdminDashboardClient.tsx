@@ -1966,15 +1966,49 @@ export const AdminDashboardClient: React.FC = () => {
 
                         <div className="flex items-center justify-between">
                           <div>
-                            <span className="text-xs font-bold text-[#121110] block">Set as Hero Section</span>
+                            <span className="text-xs font-bold text-[#121110] block">Set as Standalone Hero</span>
                             <span className="text-[10px] text-gray-500">Move Reels grid to top fold (replacing Hero Slider)</span>
                           </div>
                           <label className="relative inline-flex items-center cursor-pointer select-none">
                             <input 
                               type="checkbox" 
                               checked={!!cmsSettings.reelsAsHero} 
-                              disabled={cmsSettings.reelsEnabled === false}
+                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsSlide}
                               onChange={(e) => setCmsSettings({ ...cmsSettings, reelsAsHero: e.target.checked })}
+                              className="sr-only peer disabled:opacity-50"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DE2943] peer-disabled:opacity-50"></div>
+                          </label>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-[#121110] block">Set as Slide in Hero Slider</span>
+                            <span className="text-[10px] text-gray-500">Add Reels grid as a slide inside the Hero Slider</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer select-none">
+                            <input 
+                              type="checkbox" 
+                              checked={!!cmsSettings.reelsAsSlide} 
+                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsHero}
+                              onChange={(e) => setCmsSettings({ ...cmsSettings, reelsAsSlide: e.target.checked })}
+                              className="sr-only peer disabled:opacity-50"
+                            />
+                            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DE2943] peer-disabled:opacity-50"></div>
+                          </label>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs font-bold text-[#121110] block">Grid Mode at Bottom</span>
+                            <span className="text-[10px] text-gray-500">Normal grid layout (ON) or Fixed Parallax Background (OFF)</span>
+                          </div>
+                          <label className="relative inline-flex items-center cursor-pointer select-none">
+                            <input 
+                              type="checkbox" 
+                              checked={cmsSettings.reelsGridMode !== false} 
+                              disabled={cmsSettings.reelsEnabled === false || !!cmsSettings.reelsAsHero}
+                              onChange={(e) => setCmsSettings({ ...cmsSettings, reelsGridMode: e.target.checked })}
                               className="sr-only peer disabled:opacity-50"
                             />
                             <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#DE2943] peer-disabled:opacity-50"></div>
