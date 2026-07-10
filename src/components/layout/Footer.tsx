@@ -13,6 +13,25 @@ const InstagramIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+const FacebookIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+  </svg>
+);
+
+const YoutubeIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+    <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+  </svg>
+);
+
+const WhatsappIcon = ({ className }: { className?: string }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+  </svg>
+);
+
 export const Footer: React.FC = () => {
   const { settings } = useProductStore();
 
@@ -39,15 +58,44 @@ export const Footer: React.FC = () => {
               <ShieldCheck className="w-5 h-5" />
               <span className="text-xs font-bold uppercase tracking-wider">Termite Warranty</span>
             </div>
-            <a 
-              href="https://www.instagram.com/tenali_centralfurnitures/?hl=en" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center gap-2 text-tcf-dark hover:text-tcf-red transition-colors w-fit"
-            >
-              <InstagramIcon className="w-5 h-5" />
-              <span className="text-sm font-semibold">Follow us on Instagram</span>
-            </a>
+            <div className="flex items-center gap-3 pt-1">
+              <a 
+                href="https://www.facebook.com/profile.php?id=61587914172829" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-2 bg-zinc-200 hover:bg-[#DE2943] hover:text-white rounded-full transition-all text-tcf-dark flex items-center justify-center"
+                title="Facebook"
+              >
+                <FacebookIcon className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.instagram.com/tenali_centralfurnitures/" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-2 bg-zinc-200 hover:bg-[#DE2943] hover:text-white rounded-full transition-all text-tcf-dark flex items-center justify-center"
+                title="Instagram"
+              >
+                <InstagramIcon className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://www.youtube.com/@TENALICENTRALFURNITURES" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-2 bg-zinc-200 hover:bg-[#DE2943] hover:text-white rounded-full transition-all text-tcf-dark flex items-center justify-center"
+                title="Youtube"
+              >
+                <YoutubeIcon className="w-4 h-4" />
+              </a>
+              <a 
+                href="https://wa.me/918919546858" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-2 bg-zinc-200 hover:bg-[#DE2943] hover:text-white rounded-full transition-all text-tcf-dark flex items-center justify-center"
+                title="WhatsApp"
+              >
+                <WhatsappIcon className="w-4 h-4" />
+              </a>
+            </div>
           </div>
         </div>
 
@@ -101,6 +149,9 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link href="/refund-policy" className="hover:text-tcf-red transition-colors">Refund Policy</Link>
+              </li>
+              <li>
+                <Link href="/warranty" className="hover:text-tcf-red transition-colors">Warranty Policy</Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-tcf-red transition-colors">About Us</Link>
