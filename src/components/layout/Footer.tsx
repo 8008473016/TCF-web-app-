@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Phone, Mail, MapPin, ShieldCheck, Clock } from 'lucide-react';
 import { useProductStore } from '@/hooks/useProductStore';
 
@@ -46,7 +47,13 @@ export const Footer: React.FC = () => {
         {/* Brand Info */}
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <img src="/logo.jpg" alt="TCF Logo" className="h-10 w-auto object-contain rounded border border-tcf-sand p-0.5 bg-white" />
+            <Image 
+              src="/logo.png" 
+              alt="TCF Logo" 
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain rounded border border-tcf-sand p-0.5 bg-white" 
+            />
             <h2 className="text-2xl font-serif font-black tracking-wider text-tcf-red">TCF</h2>
           </div>
           <p className="text-[10px] text-tcf-dark/50 tracking-wider uppercase font-semibold">Tenali Central Furniture</p>

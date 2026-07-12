@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { Play, Volume2, VolumeX, X, MessageSquare, ExternalLink, Sparkles, Send } from 'lucide-react';
 import { openQuoteModal } from '@/components/layout/QuoteRequestDialog';
 
@@ -135,7 +136,13 @@ export const ReelsClient: React.FC<{ reels: ReelItem[] }> = ({ reels }) => {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full border border-zinc-700 p-0.5 overflow-hidden bg-white flex items-center justify-center">
-                    <img src="/logo.jpg" alt="TCF" className="h-full w-full object-contain rounded-full" />
+                    <Image 
+                      src="/logo.png" 
+                      alt="TCF" 
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-contain rounded-full" 
+                    />
                   </div>
                   <div>
                     <h4 className="font-serif font-black text-sm text-white tracking-wide">TCF Workshop</h4>

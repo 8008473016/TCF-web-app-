@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu, X, Search, Phone, MessageSquare, ArrowRight, ChevronDown } from 'lucide-react';
 import { useProductStore } from '@/hooks/useProductStore';
@@ -66,10 +67,13 @@ export const Navbar: React.FC = () => {
             {/* Elegant Serif Logo */}
             <div className="flex-shrink-0 flex items-center">
               <Link href="/" className="flex items-center gap-3">
-                <img 
-                  src="/logo.jpg" 
+                <Image 
+                  src="/logo.png" 
                   alt="TCF Logo" 
-                  className="h-12 w-auto object-contain rounded border border-tcf-sand p-0.5" 
+                  width={48}
+                  height={48}
+                  priority
+                  className="h-12 w-12 object-contain rounded border border-tcf-sand p-0.5" 
                 />
                 <div className="flex flex-col">
                   <span className="text-2xl font-serif font-black tracking-wider text-tcf-red leading-none">TCF</span>
