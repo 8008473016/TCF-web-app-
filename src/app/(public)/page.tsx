@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     siteName: "Tenali Central Furniture",
     images: [
       {
-        url: "https://www.tenalicentralfurnitures.com/cover-photo.jpeg",
+        url: "https://www.tenalicentralfurnitures.com/cover-photo.jpg",
         width: 1200,
         height: 630,
         alt: "Tenali Central Furniture Cover Photo"
@@ -49,7 +49,10 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tenali Furniture | Tenali Central Furniture (TCF)",
     description: "Premium handcrafted solid wood furniture in Tenali, Andhra Pradesh. Custom built for generations at factory-direct prices.",
-    images: ["https://www.tenalicentralfurnitures.com/cover-photo.jpeg"]
+    images: ["https://www.tenalicentralfurnitures.com/cover-photo.jpg"]
+  },
+  other: {
+    thumbnail: "https://www.tenalicentralfurnitures.com/cover-photo.jpg"
   }
 };
 
@@ -196,7 +199,7 @@ export default async function HomePage() {
             "@context": "https://schema.org",
             "@type": "FurnitureStore",
             "name": "Tenali Central Furniture (TCF)",
-            "image": "https://www.tenalicentralfurnitures.com/cover-photo.jpeg",
+            "image": "https://www.tenalicentralfurnitures.com/cover-photo.jpg",
             "@id": "https://www.tenalicentralfurnitures.com",
             "url": "https://www.tenalicentralfurnitures.com",
             "telephone": phone,
